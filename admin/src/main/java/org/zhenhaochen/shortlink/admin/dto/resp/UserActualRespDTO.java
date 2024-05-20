@@ -1,14 +1,12 @@
 package org.zhenhaochen.shortlink.admin.dto.resp;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
-import org.zhenhaochen.shortlink.admin.common.serialize.PhoneDesensitizationSerializer;
 
 /**
  * User Response Entity
  */
 @Data
-public class UserRespDTO {
+public class UserActualRespDTO {
 
     /**
      * id
@@ -28,7 +26,6 @@ public class UserRespDTO {
     /**
      * phone
      */
-    @JsonSerialize(using = PhoneDesensitizationSerializer.class)
     private String phone;
 
     /**

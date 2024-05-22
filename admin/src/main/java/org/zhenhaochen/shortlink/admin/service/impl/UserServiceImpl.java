@@ -23,6 +23,7 @@ import org.zhenhaochen.shortlink.admin.dto.req.UserUpdateReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.resp.UserLoginRespDTO;
 import org.zhenhaochen.shortlink.admin.dto.resp.UserRespDTO;
 import org.zhenhaochen.shortlink.admin.service.UserService;
+
 import java.util.concurrent.TimeUnit;
 
 import static org.zhenhaochen.shortlink.admin.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
@@ -94,11 +95,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 .eq(UserDO::getDelFlag, 0);
         UserDO userDO = baseMapper.selectOne(queryWrapper);
         if (userDO == null) {
-            throw new ClientException("用户不存在");
+            throw new ClientException("user does not exist");
         }
         Boolean hasLogin = stringRedisTemplate.hasKey("login_" + requestParam.getUsername());
         if (hasLogin != null && hasLogin) {
-            throw new ClientException("用户已登录");
+            throw new ClientException("user has already logged in");
         }
         /**
          * Hash
@@ -116,5 +117,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     @Override
     public Boolean checkLogin(String username, String token) {
         return stringRedisTemplate.opsForHash().get("login_" + username, token) != null;
+    }
+
+    @Override
+    public void logout(String username, String token) {
+        if (checkLogin(username, token)) {
+            stringRedisTemplate.delete("login_" + username);
+            return;
+        }
+        throw new ClientException("token does not exist or user has not logged in");
     }
 }

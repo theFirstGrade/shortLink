@@ -3,7 +3,7 @@ package org.zhenhaochen.shortlink.admin.dto.req;
 import lombok.Data;
 
 @Data
-public class UserRegisterReqDTO {
+public class UserUpdateReqDTO {
 
     /**
      * username

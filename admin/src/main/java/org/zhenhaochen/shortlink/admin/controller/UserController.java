@@ -5,8 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.zhenhaochen.shortlink.admin.common.convention.result.Result;
 import org.zhenhaochen.shortlink.admin.common.convention.result.Results;
+import org.zhenhaochen.shortlink.admin.dto.req.UserLoginReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.req.UserRegisterReqDTO;
+import org.zhenhaochen.shortlink.admin.dto.req.UserUpdateReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.resp.UserActualRespDTO;
+import org.zhenhaochen.shortlink.admin.dto.resp.UserLoginRespDTO;
 import org.zhenhaochen.shortlink.admin.dto.resp.UserRespDTO;
 import org.zhenhaochen.shortlink.admin.service.UserService;
 
@@ -50,5 +53,30 @@ public class UserController {
     public Result<Void> register(@RequestBody UserRegisterReqDTO requestParam){
         userService.register(requestParam);
         return Results.success();
+    }
+
+    /**
+     * user update
+     */
+    @PutMapping("/api/short-link/v1/user")
+    public Result<Void> update(@RequestBody UserUpdateReqDTO requestParams) {
+        userService.update(requestParams);
+        return Results.success();
+    }
+
+    /**
+     * user login
+     */
+    @PostMapping("/api/short-link/v1/user/login")
+    public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO requestParams) {
+        return Results.success(userService.login(requestParams));
+    }
+
+    /**
+     * check if the user has logged in
+     */
+    @GetMapping("/api/short-link/v1/user/check-login")
+    public Result<Boolean> checkLogin(@RequestParam("username") String username, @RequestParam("token") String token) {
+        return Results.success(userService.checkLogin(username, token));
     }
 }

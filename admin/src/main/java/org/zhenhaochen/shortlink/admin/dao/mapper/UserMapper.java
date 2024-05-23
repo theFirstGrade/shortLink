@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.zhenhaochen.shortlink.admin.dao.entity.UserDO;
 
 /**
- * Data Persistence Layer
+ * User Data Persistence Layer
  */
 public interface UserMapper extends BaseMapper<UserDO> {
 }

@@ -1,15 +1,12 @@
 package org.zhenhaochen.shortlink.admin.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
-import java.util.Date;
+import org.zhenhaochen.shortlink.admin.common.database.BaseDO;
 
 @Data
 @TableName("t_user")
-public class UserDO {
+public class UserDO extends BaseDO {
 
     /**
      * id
@@ -45,23 +42,5 @@ public class UserDO {
      * deletion_time
      */
     private Long deletionTime;
-
-    /**
-     * create_time
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
-
-    /**
-     * update_time
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date updateTime;
-
-    /**
-     * del_flag
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private Integer delFlag;
 
 }

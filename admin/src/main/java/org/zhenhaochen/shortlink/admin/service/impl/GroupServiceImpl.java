@@ -19,6 +19,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         } while (hasGid(gid));
         GroupDO groupDo = GroupDO.builder()
                 .gid(gid)
+                .sortOrder(0)
                 .name(groupName)
                 .build();
         baseMapper.insert(groupDo);

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.zhenhaochen.shortlink.admin.common.biz.user.UserContext;
+import org.zhenhaochen.shortlink.admin.common.convention.exception.ClientException;
 import org.zhenhaochen.shortlink.admin.dao.entity.GroupDO;
 import org.zhenhaochen.shortlink.admin.dao.mapper.GroupMapper;
 import org.zhenhaochen.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
@@ -38,7 +39,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getDelFlag, 0)
                 .eq(GroupDO::getUsername, UserContext.getUsername())
-                .orderByDesc(GroupDO::getSortOrder, GroupDO::getUpdateTime);
+                .orderByDesc(List.of(GroupDO::getSortOrder, GroupDO::getUpdateTime));
         List<GroupDO> groupDOList = baseMapper.selectList(queryWrapper);
         return BeanUtil.copyToList(groupDOList, ShortLinkGroupRespDTO.class);
     }
@@ -51,7 +52,24 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
                 .eq(GroupDO::getDelFlag, 0);
         GroupDO groupDO = new GroupDO();
         groupDO.setName(requestParam.getName());
-        baseMapper.update(groupDO, updateWrapper);
+        int affectRows = baseMapper.update(groupDO, updateWrapper);
+        if(affectRows == 0){
+            throw new ClientException("the group does not exist");
+        }
+    }
+
+    @Override
+    public void deleteGroup(String gid) {
+        LambdaUpdateWrapper<GroupDO> updateWrapper = Wrappers.lambdaUpdate(GroupDO.class)
+                .eq(GroupDO::getUsername, UserContext.getUsername())
+                .eq(GroupDO::getGid, gid)
+                .eq(GroupDO::getDelFlag, 0);
+        GroupDO groupDO = new GroupDO();
+        groupDO.setDelFlag(1);
+        int affectRows = baseMapper.update(groupDO, updateWrapper);
+        if(affectRows == 0){
+            throw new ClientException("the group does not exist");
+        }
     }
 
     private boolean hasGid(String gid) {

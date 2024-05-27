@@ -10,6 +10,7 @@ import org.zhenhaochen.shortlink.admin.common.biz.user.UserContext;
 import org.zhenhaochen.shortlink.admin.common.convention.exception.ClientException;
 import org.zhenhaochen.shortlink.admin.dao.entity.GroupDO;
 import org.zhenhaochen.shortlink.admin.dao.mapper.GroupMapper;
+import org.zhenhaochen.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
 import org.zhenhaochen.shortlink.admin.service.GroupService;
@@ -70,6 +71,20 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         if(affectRows == 0){
             throw new ClientException("the group does not exist");
         }
+    }
+
+    @Override
+    public void sortGroup(List<ShortLinkGroupSortReqDTO> requestParam) {
+        requestParam.forEach(each -> {
+            GroupDO groupDO = GroupDO.builder()
+                    .sortOrder(each.getSortOrder())
+                    .build();
+            LambdaUpdateWrapper<GroupDO> updateWrapper = Wrappers.lambdaUpdate(GroupDO.class)
+                    .eq(GroupDO::getUsername, UserContext.getUsername())
+                    .eq(GroupDO::getGid, each.getGid())
+                    .eq(GroupDO::getDelFlag, 0);
+            baseMapper.update(groupDO, updateWrapper);
+        });
     }
 
     private boolean hasGid(String gid) {

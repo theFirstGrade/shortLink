@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import org.zhenhaochen.shortlink.admin.common.convention.result.Result;
 import org.zhenhaochen.shortlink.admin.common.convention.result.Results;
 import org.zhenhaochen.shortlink.admin.dto.req.ShortLinkGroupSaveReqDTO;
+import org.zhenhaochen.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
 import org.zhenhaochen.shortlink.admin.service.GroupService;
@@ -47,11 +48,20 @@ public class GroupController {
     }
 
     /**
-     * delete grop
+     * delete group
      */
     @DeleteMapping("/api/short-link/v1/group")
     public Result<Void> updateGroup(@RequestParam("gid") String gid) {
         groupService.deleteGroup(gid);
+        return Results.success();
+    }
+
+    /**
+     * sort group
+     */
+    @PostMapping("/api/short-link/v1/group/sort")
+    public Result<Void> updateGroup(@RequestBody List<ShortLinkGroupSortReqDTO> requestParam) {
+        groupService.sortGroup(requestParam);
         return Results.success();
     }
 

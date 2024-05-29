@@ -79,4 +79,9 @@ public class ShortLinkDO extends BaseDO {
      */
 //    @TableField("`describe`")
     private String description;
+
+    /**
+     * icon
+     */
+    private String favicon;
 }

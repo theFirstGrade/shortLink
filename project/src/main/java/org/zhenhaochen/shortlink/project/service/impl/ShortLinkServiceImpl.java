@@ -1,6 +1,10 @@
 package org.zhenhaochen.shortlink.project.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.StrBuilder;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +15,9 @@ import org.zhenhaochen.shortlink.project.common.convention.exception.ServerExcep
 import org.zhenhaochen.shortlink.project.dao.entity.ShortLinkDO;
 import org.zhenhaochen.shortlink.project.dao.mapper.ShortLinkMapper;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkCreateReqDTO;
+import org.zhenhaochen.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
+import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import org.zhenhaochen.shortlink.project.service.ShortLinkService;
 import org.zhenhaochen.shortlink.project.toolkit.HashUtil;
 
@@ -58,6 +64,17 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .originUrl(requestParam.getOriginUrl())
                 .gid(requestParam.getGid())
                 .build();
+    }
+
+    @Override
+    public IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestParam) {
+        LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+                .eq(ShortLinkDO::getGid, requestParam.getGid())
+                .eq(ShortLinkDO::getEnableStatus, 0)
+                .eq(ShortLinkDO::getDelFlag, 0)
+                .orderByDesc(ShortLinkDO::getCreateTime);
+        IPage<ShortLinkDO> resultPage = baseMapper.selectPage(requestParam, queryWrapper);
+        return resultPage.convert(each -> BeanUtil.toBean(each, ShortLinkPageRespDTO.class));
     }
 
     private String generateSuffix(ShortLinkCreateReqDTO requestParam) {

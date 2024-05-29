@@ -6,7 +6,7 @@ import org.zhenhaochen.shortlink.project.common.convention.errorcode.IErrorCode;
 import java.util.Optional;
 
 /**
- * 服务端异常
+ * Server Exception
  */
 public class ServerException extends AbstractException {
 

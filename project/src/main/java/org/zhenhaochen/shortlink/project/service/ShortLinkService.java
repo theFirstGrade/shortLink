@@ -21,7 +21,7 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
     ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam);
 
     /**
-     * short link paging partition query
+     * short link paging query
      * @return short link paging partition result
      */
     IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestParam);

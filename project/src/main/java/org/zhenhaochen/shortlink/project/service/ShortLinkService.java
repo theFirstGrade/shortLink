@@ -6,7 +6,10 @@ import org.zhenhaochen.shortlink.project.dao.entity.ShortLinkDO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
+import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkPageRespDTO;
+
+import java.util.List;
 
 /**
  * Short Link Interface Layer
@@ -22,7 +25,13 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
 
     /**
      * short link paging query
-     * @return short link paging partition result
+     * @return short link paging result
      */
     IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestParam);
+
+    /**
+     * query short link count in a group
+     * @return short link count in a group
+     */
+    List<ShortLinkGroupCountQueryRespDTO> listGroupShortLinkCount(List<String> requestParam);
 }

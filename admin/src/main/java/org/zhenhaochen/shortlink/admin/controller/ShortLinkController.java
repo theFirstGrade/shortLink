@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.zhenhaochen.shortlink.admin.common.convention.result.Result;
-import org.zhenhaochen.shortlink.admin.remote.dto.ShortLinkRemoteService;
+import org.zhenhaochen.shortlink.admin.remote.ShortLinkRemoteService;
 import org.zhenhaochen.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.zhenhaochen.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import org.zhenhaochen.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;

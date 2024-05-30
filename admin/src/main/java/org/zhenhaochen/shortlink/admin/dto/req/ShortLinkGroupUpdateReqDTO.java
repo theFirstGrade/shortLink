@@ -18,4 +18,3 @@ public class ShortLinkGroupUpdateReqDTO {
      */
     private String name;
 }
-

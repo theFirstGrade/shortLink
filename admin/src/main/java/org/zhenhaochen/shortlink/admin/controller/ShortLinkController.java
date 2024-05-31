@@ -1,14 +1,13 @@
 package org.zhenhaochen.shortlink.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.zhenhaochen.shortlink.admin.common.convention.result.Result;
+import org.zhenhaochen.shortlink.admin.common.convention.result.Results;
 import org.zhenhaochen.shortlink.admin.remote.ShortLinkRemoteService;
 import org.zhenhaochen.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.zhenhaochen.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import org.zhenhaochen.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
 import org.zhenhaochen.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import org.zhenhaochen.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 
@@ -30,6 +29,15 @@ public class ShortLinkController {
     @PostMapping("/api/short-link/admin/v1/create")
     public Result<ShortLinkCreateRespDTO> createShortLink(@RequestBody ShortLinkCreateReqDTO requestParam) {
         return shortLinkRemoteService.createShortLink(requestParam);
+    }
+
+    /**
+     * update short link
+     */
+    @PutMapping("/api/short-link/admin/v1/update")
+    public Result<Void> updateShortLink(@RequestBody ShortLinkUpdateReqDTO requestParam) {
+        shortLinkRemoteService.updateShortLink(requestParam);
+        return Results.success();
     }
 
     /**

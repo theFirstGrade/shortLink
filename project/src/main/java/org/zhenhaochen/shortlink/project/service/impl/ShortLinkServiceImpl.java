@@ -37,6 +37,7 @@ import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDT
 import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import org.zhenhaochen.shortlink.project.service.ShortLinkService;
 import org.zhenhaochen.shortlink.project.toolkit.HashUtil;
+import org.zhenhaochen.shortlink.project.toolkit.LinkUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -89,6 +90,11 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             log.warn("short link: {} duplicate short link", fullShortUrl);
             throw new ServerException("generate duplicate short link");
         }
+        stringRedisTemplate.opsForValue().set(
+                String.format(GOTO_SHORT_LINK_KEY, fullShortUrl),
+                requestParam.getOriginUrl(),
+                LinkUtil.getLinkCacheValidTime(requestParam.getValidDate()), TimeUnit.MILLISECONDS
+        );
         shortUriCreateCachePenetrationBloomFilter.add(fullShortUrl);
         return ShortLinkCreateRespDTO.builder()
                 .fullShortUrl("http://" + shortLinkDO.getFullShortUrl())

@@ -2,6 +2,8 @@ package org.zhenhaochen.shortlink.project.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import org.zhenhaochen.shortlink.project.dao.entity.ShortLinkDO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkPageReqDTO;
@@ -25,6 +27,11 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
     ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam);
 
     /**
+     * update short link
+     */
+    void updateShortLink(ShortLinkUpdateReqDTO requestParam);
+
+    /**
      * short link paging query
      * @return short link paging result
      */
@@ -37,7 +44,11 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
     List<ShortLinkGroupCountQueryRespDTO> listGroupShortLinkCount(List<String> requestParam);
 
     /**
-     * update short link
+     * redirect short link
+     *
+     * @param shortUri short link uri
+     * @param request  HTTP request
+     * @param response HTTP response
      */
-    void updateShortLink(ShortLinkUpdateReqDTO requestParam);
+    void restoreUrl(String shortUri, ServletRequest request, ServletResponse response);
 }

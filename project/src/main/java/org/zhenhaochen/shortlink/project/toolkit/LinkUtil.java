@@ -9,7 +9,7 @@ import java.util.Optional;
 import static org.zhenhaochen.shortlink.project.common.constant.ShortLinkConstant.DEFAULT_CACHE_VALID_TIME;
 
 /**
- * 短链接工具类
+ * Short Link Toolkit
  */
 public class LinkUtil {
 

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.zhenhaochen.shortlink.admin.common.convention.result.Result;
 import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinRecoverReqDTO;
+import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinRemoveReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinSaveReqDTO;
 import org.zhenhaochen.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.zhenhaochen.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
@@ -107,4 +108,12 @@ public interface ShortLinkRemoteService {
     default void recoverRecycleBin(RecycleBinRecoverReqDTO requestParam) {
         HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/recover", JSON.toJSONString(requestParam));
     }
+
+    /**
+     * remove short link
+     */
+    default void removeRecycleBin(RecycleBinRemoveReqDTO requestParam) {
+        HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/remove", JSON.toJSONString(requestParam));
+    }
+
 }

@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.zhenhaochen.shortlink.admin.common.convention.result.Result;
+import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinRecoverReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinSaveReqDTO;
 import org.zhenhaochen.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.zhenhaochen.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
@@ -98,5 +99,12 @@ public interface ShortLinkRemoteService {
         String resultPageStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/page", requestMap);
         return JSON.parseObject(resultPageStr, new TypeReference<>() {
         });
+    }
+
+    /**
+     * recover short link
+     */
+    default void recoverRecycleBin(RecycleBinRecoverReqDTO requestParam) {
+        HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/recover", JSON.toJSONString(requestParam));
     }
 }

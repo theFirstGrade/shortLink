@@ -113,4 +113,16 @@ public class LinkUtil {
         }
         return "PC";
     }
+
+    /**
+     * get user network
+     *
+     * @param request request
+     * @return network
+     */
+    public static String getNetwork(HttpServletRequest request) {
+        String actualIp = getActualIp(request);
+        return actualIp.startsWith("192.168.") || actualIp.startsWith("10.") ? "WIFI" : "Mobile";
+    }
+
 }

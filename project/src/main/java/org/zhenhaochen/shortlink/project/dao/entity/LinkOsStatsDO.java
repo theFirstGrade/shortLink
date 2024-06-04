@@ -10,7 +10,7 @@ import org.zhenhaochen.shortlink.project.common.database.BaseDO;
 import java.util.Date;
 
 /**
- * 操作系统统计访问实体
+ * Operating System Access Statistic Entity
  */
 @Data
 @TableName("t_link_os_stats")

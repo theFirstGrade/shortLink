@@ -10,14 +10,14 @@ import org.zhenhaochen.shortlink.project.common.database.BaseDO;
 import java.util.Date;
 
 /**
- * Region Access Statistic Entity
+ * Browser Access Statistic Entity
  */
 @Data
-@TableName("t_link_locale_stats")
+@TableName("t_link_browser_stats")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LinkLocaleStatsDO extends BaseDO {
+public class LinkBrowserStatsDO extends BaseDO {
 
     /**
      * id
@@ -45,22 +45,8 @@ public class LinkLocaleStatsDO extends BaseDO {
     private Integer cnt;
 
     /**
-     * region name
+     * browser
      */
-    private String province;
-
-    /**
-     * city
-     */
-    private String city;
-
-    /**
-     * postal code
-     */
-    private String postal;
-
-    /**
-     * country
-     */
-    private String country;
+    private String browser;
 }
+

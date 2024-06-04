@@ -30,6 +30,7 @@
         <redisson.version>3.21.3</redisson.version>
         <guava.version>30.0-jre</guava.version>
         <jsoup.version>1.15.3</jsoup.version>
+        <ipinfo.version>3.0.0</ipinfo.version>
     </properties>
 
     <dependencies>

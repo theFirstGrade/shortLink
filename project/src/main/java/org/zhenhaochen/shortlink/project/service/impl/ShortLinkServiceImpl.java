@@ -1,16 +1,19 @@
 package org.zhenhaochen.shortlink.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.UUID;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.lang.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.ipinfo.api.IPinfo;
+import io.ipinfo.api.errors.RateLimitedException;
+import io.ipinfo.api.model.IPResponse;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
@@ -25,6 +28,7 @@ import org.jsoup.nodes.Element;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -33,9 +37,11 @@ import org.zhenhaochen.shortlink.project.common.convention.exception.ClientExcep
 import org.zhenhaochen.shortlink.project.common.convention.exception.ServerException;
 import org.zhenhaochen.shortlink.project.common.enums.VailDateTypeEnum;
 import org.zhenhaochen.shortlink.project.dao.entity.LinkAccessStatsDO;
+import org.zhenhaochen.shortlink.project.dao.entity.LinkLocaleStatsDO;
 import org.zhenhaochen.shortlink.project.dao.entity.ShortLinkDO;
 import org.zhenhaochen.shortlink.project.dao.entity.ShortLinkGotoDO;
 import org.zhenhaochen.shortlink.project.dao.mapper.LinkAccessStatsMapper;
+import org.zhenhaochen.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
 import org.zhenhaochen.shortlink.project.dao.mapper.ShortLinkGotoMapper;
 import org.zhenhaochen.shortlink.project.dao.mapper.ShortLinkMapper;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkCreateReqDTO;
@@ -71,6 +77,10 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final StringRedisTemplate stringRedisTemplate;
     private final RedissonClient redissonClient;
     private final LinkAccessStatsMapper linkAccessStatsMapper;
+    private final LinkLocaleStatsMapper linkLocaleStatsMapper;
+
+    @Value("${short-link.stats.locale.IPInfo-key}")
+    private String statsLocaleIPInfoKey;
 
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
@@ -280,6 +290,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(queryWrapper);
                 gid = shortLinkGotoDO.getGid();
             }
+            Date date = new Date();
             int hourOfDay = LocalTime.now().getHour();
             int dayOfWeek = LocalDate.now().getDayOfWeek().getValue();
             LinkAccessStatsDO linkAccessStatsDO = LinkAccessStatsDO.builder()
@@ -290,9 +301,33 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .weekday(dayOfWeek)
                     .fullShortUrl(fullShortUrl)
                     .gid(gid)
-                    .date(new Date())
+                    .date(date)
                     .build();
             linkAccessStatsMapper.shortLinkStats(linkAccessStatsDO);
+
+            IPinfo ipInfo = new IPinfo.Builder()
+                    .setToken(statsLocaleIPInfoKey)
+                    .build();
+            // IPInfo api revoke
+            try {
+                IPResponse IPInfoResponse = ipInfo.lookupIP(remoteAddr);
+                if (IPInfoResponse != null) {
+                    boolean unknownFlag = IPInfoResponse.getBogon();
+                    LinkLocaleStatsDO linkLocaleStatsDO = LinkLocaleStatsDO.builder()
+                            .province(unknownFlag ? "unknown" : IPInfoResponse.getRegion())
+                            .city(unknownFlag ? "unknown" : IPInfoResponse.getCity())
+                            .postal(unknownFlag ? "unknown" : IPInfoResponse.getPostal())
+                            .cnt(1)
+                            .fullShortUrl(fullShortUrl)
+                            .country("US")
+                            .gid(gid)
+                            .date(date)
+                            .build();
+                    linkLocaleStatsMapper.shortLinkLocaleState(linkLocaleStatsDO);
+                }
+            } catch (RateLimitedException ex) {
+                throw new ServerException("IPInfo api went wrong");
+            }
         } catch (Throwable ex) {
             log.error("short link access static exception", ex);
         }

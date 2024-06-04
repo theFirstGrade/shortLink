@@ -69,6 +69,12 @@
             <version>${jsoup.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.ipinfo</groupId>
+            <artifactId>ipinfo-api</artifactId>
+            <version>${ipinfo.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

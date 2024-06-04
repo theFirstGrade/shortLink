@@ -36,14 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.zhenhaochen.shortlink.project.common.convention.exception.ClientException;
 import org.zhenhaochen.shortlink.project.common.convention.exception.ServerException;
 import org.zhenhaochen.shortlink.project.common.enums.VailDateTypeEnum;
-import org.zhenhaochen.shortlink.project.dao.entity.LinkAccessStatsDO;
-import org.zhenhaochen.shortlink.project.dao.entity.LinkLocaleStatsDO;
-import org.zhenhaochen.shortlink.project.dao.entity.ShortLinkDO;
-import org.zhenhaochen.shortlink.project.dao.entity.ShortLinkGotoDO;
-import org.zhenhaochen.shortlink.project.dao.mapper.LinkAccessStatsMapper;
-import org.zhenhaochen.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
-import org.zhenhaochen.shortlink.project.dao.mapper.ShortLinkGotoMapper;
-import org.zhenhaochen.shortlink.project.dao.mapper.ShortLinkMapper;
+import org.zhenhaochen.shortlink.project.dao.entity.*;
+import org.zhenhaochen.shortlink.project.dao.mapper.*;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
@@ -78,6 +72,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final RedissonClient redissonClient;
     private final LinkAccessStatsMapper linkAccessStatsMapper;
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
+    private final LinkOsStatsMapper linkOsStatsMapper;
 
     @Value("${short-link.stats.locale.IPInfo-key}")
     private String statsLocaleIPInfoKey;
@@ -281,7 +276,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             } else {
                 addResponseCookieTask.run();
             }
-            String remoteAddr = LinkUtil.getActualIp(((HttpServletRequest) request));
+            String remoteAddr = LinkUtil.getActualIp((HttpServletRequest) request);
             Long uipAdded = stringRedisTemplate.opsForSet().add("short-link:stats:uip:" + fullShortUrl, remoteAddr);
             boolean uipFirstFlag = uipAdded != null && uipAdded > 0L;
             if (StrUtil.isBlank(gid)) {
@@ -328,6 +323,14 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             } catch (RateLimitedException ex) {
                 throw new ServerException("IPInfo api went wrong");
             }
+            LinkOsStatsDO linkOsStatsDO = LinkOsStatsDO.builder()
+                    .os(LinkUtil.getOs((HttpServletRequest) request))
+                    .cnt(1)
+                    .gid(gid)
+                    .fullShortUrl(fullShortUrl)
+                    .date(new Date())
+                    .build();
+            linkOsStatsMapper.shortLinkOsState(linkOsStatsDO);
         } catch (Throwable ex) {
             log.error("short link access static exception", ex);
         }

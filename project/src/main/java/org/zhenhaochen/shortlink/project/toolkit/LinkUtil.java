@@ -100,5 +100,17 @@ public class LinkUtil {
         }
     }
 
-
+    /**
+     * get user device
+     *
+     * @param request request
+     * @return device
+     */
+    public static String getDevice(HttpServletRequest request) {
+        String userAgent = request.getHeader("User-Agent");
+        if (userAgent.toLowerCase().contains("mobile")) {
+            return "Mobile";
+        }
+        return "PC";
+    }
 }

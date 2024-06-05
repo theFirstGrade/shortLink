@@ -3,7 +3,11 @@ package org.zhenhaochen.shortlink.project.dao.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.zhenhaochen.shortlink.project.dao.entity.LinkNetworkStatsDO;
+import org.zhenhaochen.shortlink.project.dto.req.ShortLinkStatsReqDTO;
+
+import java.util.List;
 
 /**
  * Device Access Statistic Persistence Layer
@@ -37,5 +41,21 @@ public interface LinkNetworkStatsMapper extends BaseMapper<LinkNetworkStatsDO> {
                 cnt = cnt + #{linkNetworkStats.cnt};
             """)
     void shortLinkNetworkState(@Param("linkNetworkStats") LinkNetworkStatsDO linkNetworkStatsDO);
+
+    /**
+     * get network monitor statistic between specified dates
+     */
+    @Select("SELECT " +
+            "    network, " +
+            "    SUM(cnt) AS cnt " +
+            "FROM " +
+            "    t_link_network_stats " +
+            "WHERE " +
+            "    full_short_url = #{param.fullShortUrl} " +
+            "    AND gid = #{param.gid} " +
+            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "GROUP BY " +
+            "    full_short_url, gid, network;")
+    List<LinkNetworkStatsDO> listNetworkStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
 }
 

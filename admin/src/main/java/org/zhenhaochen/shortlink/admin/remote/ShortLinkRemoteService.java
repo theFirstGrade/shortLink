@@ -1,5 +1,6 @@
 package org.zhenhaochen.shortlink.admin.remote;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
@@ -9,13 +10,11 @@ import org.zhenhaochen.shortlink.admin.common.convention.result.Result;
 import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinRecoverReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinRemoveReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinSaveReqDTO;
-import org.zhenhaochen.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
-import org.zhenhaochen.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
-import org.zhenhaochen.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
-import org.zhenhaochen.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
+import org.zhenhaochen.shortlink.admin.remote.dto.req.*;
 import org.zhenhaochen.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import org.zhenhaochen.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.zhenhaochen.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
+import org.zhenhaochen.shortlink.admin.remote.dto.resp.ShortLinkStatsRespDTO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -116,4 +115,13 @@ public interface ShortLinkRemoteService {
         HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/remove", JSON.toJSONString(requestParam));
     }
 
+    /**
+     * get single short link monitor statistic between specified dates
+     * @return short link monitor statistic
+     */
+    default Result<ShortLinkStatsRespDTO> oneShortLinkStats(ShortLinkStatsReqDTO requestParam) {
+        String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats", BeanUtil.beanToMap(requestParam));
+        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
+        });
+    }
 }

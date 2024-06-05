@@ -307,17 +307,19 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .build();
             linkAccessStatsMapper.shortLinkStats(linkAccessStatsDO);
 
+            // IPInfo api revoke
+            String actualProvince = "unknown";
+            String actualCity = "unknown";
             IPinfo ipInfo = new IPinfo.Builder()
                     .setToken(statsLocaleIPInfoKey)
                     .build();
-            // IPInfo api revoke
             try {
                 IPResponse IPInfoResponse = ipInfo.lookupIP(remoteAddr);
                 if (IPInfoResponse != null) {
                     boolean unknownFlag = IPInfoResponse.getBogon();
                     LinkLocaleStatsDO linkLocaleStatsDO = LinkLocaleStatsDO.builder()
-                            .province(unknownFlag ? "unknown" : IPInfoResponse.getRegion())
-                            .city(unknownFlag ? "unknown" : IPInfoResponse.getCity())
+                            .province(actualProvince = unknownFlag ? "unknown" : IPInfoResponse.getRegion())
+                            .city(actualCity = unknownFlag ? "unknown" : IPInfoResponse.getCity())
                             .postal(unknownFlag ? "unknown" : IPInfoResponse.getPostal())
                             .cnt(1)
                             .fullShortUrl(fullShortUrl)
@@ -337,7 +339,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .cnt(1)
                     .gid(gid)
                     .fullShortUrl(fullShortUrl)
-                    .date(new Date())
+                    .date(date)
                     .build();
             linkOsStatsMapper.shortLinkOsState(linkOsStatsDO);
             // browser
@@ -347,37 +349,42 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .cnt(1)
                     .gid(gid)
                     .fullShortUrl(fullShortUrl)
-                    .date(new Date())
+                    .date(date)
                     .build();
             linkBrowserStatsMapper.shortLinkBrowserState(linkBrowserStatsDO);
+            // device
+            String device = LinkUtil.getDevice((HttpServletRequest) request);
+            LinkDeviceStatsDO linkDeviceStatsDO = LinkDeviceStatsDO.builder()
+                    .device(device)
+                    .cnt(1)
+                    .gid(gid)
+                    .fullShortUrl(fullShortUrl)
+                    .date(date)
+                    .build();
+            linkDeviceStatsMapper.shortLinkDeviceState(linkDeviceStatsDO);
+            // network
+            String network = LinkUtil.getNetwork((HttpServletRequest) request);
+            LinkNetworkStatsDO linkNetworkStatsDO = LinkNetworkStatsDO.builder()
+                    .network(network)
+                    .cnt(1)
+                    .gid(gid)
+                    .fullShortUrl(fullShortUrl)
+                    .date(date)
+                    .build();
+            linkNetworkStatsMapper.shortLinkNetworkState(linkNetworkStatsDO);
             // logs
             LinkAccessLogsDO linkAccessLogsDO = LinkAccessLogsDO.builder()
                     .user(uv.get())
                     .ip(remoteAddr)
                     .browser(browser)
                     .os(os)
+                    .network(network)
+                    .device(device)
+                    .locale(StrUtil.join("-", "US", actualProvince, actualCity))
                     .gid(gid)
                     .fullShortUrl(fullShortUrl)
                     .build();
             linkAccessLogsMapper.insert(linkAccessLogsDO);
-            // device
-            LinkDeviceStatsDO linkDeviceStatsDO = LinkDeviceStatsDO.builder()
-                    .device(LinkUtil.getDevice((HttpServletRequest) request))
-                    .cnt(1)
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .date(new Date())
-                    .build();
-            linkDeviceStatsMapper.shortLinkDeviceState(linkDeviceStatsDO);
-            LinkNetworkStatsDO linkNetworkStatsDO = LinkNetworkStatsDO.builder()
-                    .network(LinkUtil.getNetwork((HttpServletRequest) request))
-                    .cnt(1)
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .date(new Date())
-                    .build();
-            linkNetworkStatsMapper.shortLinkNetworkState(linkNetworkStatsDO);
-
         } catch (Throwable ex) {
             log.error("short link access static exception", ex);
         }

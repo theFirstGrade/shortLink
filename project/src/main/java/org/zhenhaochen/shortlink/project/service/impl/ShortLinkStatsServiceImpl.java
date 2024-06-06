@@ -1,15 +1,18 @@
 package org.zhenhaochen.shortlink.project.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.zhenhaochen.shortlink.project.dao.entity.LinkAccessStatsDO;
-import org.zhenhaochen.shortlink.project.dao.entity.LinkDeviceStatsDO;
-import org.zhenhaochen.shortlink.project.dao.entity.LinkLocaleStatsDO;
-import org.zhenhaochen.shortlink.project.dao.entity.LinkNetworkStatsDO;
+import org.zhenhaochen.shortlink.project.dao.entity.*;
 import org.zhenhaochen.shortlink.project.dao.mapper.*;
+import org.zhenhaochen.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkStatsReqDTO;
 import org.zhenhaochen.shortlink.project.dto.resp.*;
 import org.zhenhaochen.shortlink.project.service.ShortLinkStatsService;
@@ -69,7 +72,7 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                             .build();
                     daily.add(accessDailyRespDTO);
                 }));
-        // 地区访问详情（仅国内）
+        // region statistic
         List<ShortLinkStatsLocaleCNRespDTO> localeCnStats = new ArrayList<>();
         List<LinkLocaleStatsDO> listedLocaleByShortLink = linkLocaleStatsMapper.listLocaleByShortLink(requestParam);
         int localeCnSum = listedLocaleByShortLink.stream()
@@ -85,7 +88,7 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                     .build();
             localeCnStats.add(localeCNRespDTO);
         });
-        // 小时访问详情
+        // hour statistic
         List<Integer> hourStats = new ArrayList<>();
         List<LinkAccessStatsDO> listHourStatsByShortLink = linkAccessStatsMapper.listHourStatsByShortLink(requestParam);
         for (int i = 0; i < 24; i++) {
@@ -97,7 +100,7 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                     .orElse(0);
             hourStats.add(hourCnt);
         }
-        // 高频访问IP详情
+        // top ip statistic
         List<ShortLinkStatsTopIpRespDTO> topIpStats = new ArrayList<>();
         List<HashMap<String, Object>> listTopIpByShortLink = linkAccessLogsMapper.listTopIpByShortLink(requestParam);
         listTopIpByShortLink.forEach(each -> {
@@ -107,7 +110,7 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                     .build();
             topIpStats.add(statsTopIpRespDTO);
         });
-        // 一周访问详情
+        // weekday statistic
         List<Integer> weekdayStats = new ArrayList<>();
         List<LinkAccessStatsDO> listWeekdayStatsByShortLink = linkAccessStatsMapper.listWeekdayStatsByShortLink(requestParam);
         for (int i = 1; i < 8; i++) {
@@ -119,7 +122,7 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                     .orElse(0);
             weekdayStats.add(weekdayCnt);
         }
-        // 浏览器访问详情
+        // browser statistic
         List<ShortLinkStatsBrowserRespDTO> browserStats = new ArrayList<>();
         List<HashMap<String, Object>> listBrowserStatsByShortLink = linkBrowserStatsMapper.listBrowserStatsByShortLink(requestParam);
         int browserSum = listBrowserStatsByShortLink.stream()
@@ -135,7 +138,7 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                     .build();
             browserStats.add(browserRespDTO);
         });
-        // 操作系统访问详情
+        // os statistic
         List<ShortLinkStatsOsRespDTO> osStats = new ArrayList<>();
         List<HashMap<String, Object>> listOsStatsByShortLink = linkOsStatsMapper.listOsStatsByShortLink(requestParam);
         int osSum = listOsStatsByShortLink.stream()
@@ -151,7 +154,7 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                     .build();
             osStats.add(osRespDTO);
         });
-        // 访客访问类型详情
+        // visitor type statistic
         List<ShortLinkStatsUvRespDTO> uvTypeStats = new ArrayList<>();
         HashMap<String, Object> findUvTypeByShortLink = linkAccessLogsMapper.findUvTypeCntByShortLink(requestParam);
         int oldUserCnt = Integer.parseInt(
@@ -172,18 +175,18 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
         double newRatio = (double) newUserCnt / uvSum;
         double actualNewRatio = Math.round(newRatio * 100.0) / 100.0;
         ShortLinkStatsUvRespDTO newUvRespDTO = ShortLinkStatsUvRespDTO.builder()
-                .uvType("newUser")
+                .uvType("new visitor")
                 .cnt(newUserCnt)
                 .ratio(actualNewRatio)
                 .build();
         uvTypeStats.add(newUvRespDTO);
         ShortLinkStatsUvRespDTO oldUvRespDTO = ShortLinkStatsUvRespDTO.builder()
-                .uvType("oldUser")
+                .uvType("old visitor")
                 .cnt(oldUserCnt)
                 .ratio(actualOldRatio)
                 .build();
         uvTypeStats.add(oldUvRespDTO);
-        // 访问设备类型详情
+        // device statistic
         List<ShortLinkStatsDeviceRespDTO> deviceStats = new ArrayList<>();
         List<LinkDeviceStatsDO> listDeviceStatsByShortLink = linkDeviceStatsMapper.listDeviceStatsByShortLink(requestParam);
         int deviceSum = listDeviceStatsByShortLink.stream()
@@ -199,7 +202,7 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                     .build();
             deviceStats.add(deviceRespDTO);
         });
-        // 访问网络类型详情
+        // network statistic
         List<ShortLinkStatsNetworkRespDTO> networkStats = new ArrayList<>();
         List<LinkNetworkStatsDO> listNetworkStatsByShortLink = linkNetworkStatsMapper.listNetworkStatsByShortLink(requestParam);
         int networkSum = listNetworkStatsByShortLink.stream()
@@ -230,5 +233,42 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                 .deviceStats(deviceStats)
                 .networkStats(networkStats)
                 .build();
+    }
+
+    @Override
+    public IPage<ShortLinkStatsAccessRecordRespDTO> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
+        requestParam.setStartDate(requestParam.getStartDate() + " 00:00:00");
+        requestParam.setEndDate(requestParam.getEndDate() + " 23:59:59");
+        LambdaQueryWrapper<LinkAccessLogsDO> queryWrapper = Wrappers.lambdaQuery(LinkAccessLogsDO.class)
+                .eq(LinkAccessLogsDO::getGid, requestParam.getGid())
+                .eq(LinkAccessLogsDO::getFullShortUrl, requestParam.getFullShortUrl())
+                .between(LinkAccessLogsDO::getCreateTime, requestParam.getStartDate(), requestParam.getEndDate())
+                .eq(LinkAccessLogsDO::getDelFlag, 0)
+                .orderByDesc(LinkAccessLogsDO::getCreateTime);
+        IPage<LinkAccessLogsDO> linkAccessLogsDOIPage = linkAccessLogsMapper.selectPage(requestParam, queryWrapper);
+        if (CollUtil.isEmpty(linkAccessLogsDOIPage.getRecords())) {
+            return new Page<>();
+        }
+        IPage<ShortLinkStatsAccessRecordRespDTO> actualResult = linkAccessLogsDOIPage.convert(each -> BeanUtil.toBean(each, ShortLinkStatsAccessRecordRespDTO.class));
+        List<String> userAccessLogsList = actualResult.getRecords().stream()
+                .map(ShortLinkStatsAccessRecordRespDTO::getUser)
+                .toList();
+        List<Map<String, Object>> uvTypeList = linkAccessLogsMapper.selectUvTypeByUsers(
+                requestParam.getGid(),
+                requestParam.getFullShortUrl(),
+                requestParam.getStartDate(),
+                requestParam.getEndDate(),
+                userAccessLogsList
+        );
+        actualResult.getRecords().forEach(each -> {
+            String uvType = uvTypeList.stream()
+                    .filter(item -> Objects.equals(each.getUser(), item.get("user")))
+                    .findFirst()
+                    .map(item -> item.get("uvType"))
+                    .map(Object::toString)
+                    .orElse("old visitor");
+            each.setUvType(uvType);
+        });
+        return actualResult;
     }
 }

@@ -11,10 +11,7 @@ import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinRecoverReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinRemoveReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinSaveReqDTO;
 import org.zhenhaochen.shortlink.admin.remote.dto.req.*;
-import org.zhenhaochen.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
-import org.zhenhaochen.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
-import org.zhenhaochen.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
-import org.zhenhaochen.shortlink.admin.remote.dto.resp.ShortLinkStatsRespDTO;
+import org.zhenhaochen.shortlink.admin.remote.dto.resp.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -124,4 +121,17 @@ public interface ShortLinkRemoteService {
         return JSON.parseObject(resultBodyStr, new TypeReference<>() {
         });
     }
+
+    /**
+     * paging query short link monitor statistic between specified dates
+     */
+    default Result<IPage<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
+        Map<String, Object> stringObjectMap = BeanUtil.beanToMap(requestParam, false, true);
+        stringObjectMap.remove("orders");
+        stringObjectMap.remove("records");
+        String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats/access-record", stringObjectMap);
+        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
+        });
+    }
+
 }

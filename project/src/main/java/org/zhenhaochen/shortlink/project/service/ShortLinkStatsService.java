@@ -1,6 +1,9 @@
 package org.zhenhaochen.shortlink.project.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.zhenhaochen.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkStatsReqDTO;
+import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkStatsAccessRecordRespDTO;
 import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkStatsRespDTO;
 
 /**
@@ -13,4 +16,9 @@ public interface ShortLinkStatsService {
      * @return monitor statistic
      */
     ShortLinkStatsRespDTO oneShortLinkStats(ShortLinkStatsReqDTO requestParam);
+
+    /**
+     * paging query short link monitor statistic
+     */
+    IPage<ShortLinkStatsAccessRecordRespDTO> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam);
 }

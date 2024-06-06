@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import org.zhenhaochen.shortlink.project.common.database.BaseDO;
 
+import java.util.Date;
+
 /**
  * Short Link Daily Statistic Entity
  */

@@ -19,3 +19,8 @@ short-link:
   stats:
     locale:
       IPInfo-key: e140f5cce7ad5a
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:mapper/*.xml

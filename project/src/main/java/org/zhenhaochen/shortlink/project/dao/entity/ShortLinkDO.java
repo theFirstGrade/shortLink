@@ -1,5 +1,6 @@
 package org.zhenhaochen.shortlink.project.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -77,7 +78,6 @@ public class ShortLinkDO extends BaseDO {
     /**
      * description
      */
-//    @TableField("`describe`")
     private String description;
 
     /**
@@ -100,4 +100,21 @@ public class ShortLinkDO extends BaseDO {
      */
     private Integer totalUip;
 
+    /**
+     * today PV
+     */
+    @TableField(exist = false)
+    private Integer todayPv;
+
+    /**
+     * today UV
+     */
+    @TableField(exist = false)
+    private Integer todayUv;
+
+    /**
+     * today UIP
+     */
+    @TableField(exist = false)
+    private Integer todayUip;
 }

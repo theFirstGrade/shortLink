@@ -44,6 +44,9 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
         if (CollUtil.isEmpty(listStatsByShortLink)) {
             return null;
         }
+        // I use another approach to achieve this -- add up pv, uv and uip instead of query database
+        // total pv, uv, uip between specified dates
+//        LinkAccessStatsDO pvUvUidStatsByShortLink = linkAccessLogsMapper.findPvUvUidStatsByShortLink(requestParam);
         // basic statistic
         List<ShortLinkStatsAccessDailyRespDTO> daily = new ArrayList<>();
         List<String> rangeDates = DateUtil.rangeToList(DateUtil.parse(requestParam.getStartDate()), DateUtil.parse(requestParam.getEndDate()), DateField.DAY_OF_MONTH).stream()
@@ -219,6 +222,9 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
             networkStats.add(networkRespDTO);
         });
         return ShortLinkStatsRespDTO.builder()
+//                .pv(pvUvUidStatsByShortLink.getPv())
+//                .uv(pvUvUidStatsByShortLink.getUv())
+//                .uip(pvUvUidStatsByShortLink.getUip())
                 .pv(pv.get())
                 .uv(uv.get())
                 .uip(uip.get())

@@ -78,6 +78,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkAccessLogsMapper linkAccessLogsMapper;
     private final LinkDeviceStatsMapper linkDeviceStatsMapper;
     private final LinkNetworkStatsMapper linkNetworkStatsMapper;
+    private final LinkStatsTodayMapper linkTodayStatsMapper;
 
     @Value("${short-link.stats.locale.IPInfo-key}")
     private String statsLocaleIPInfoKey;
@@ -388,9 +389,24 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .fullShortUrl(fullShortUrl)
                     .build();
             linkAccessLogsMapper.insert(linkAccessLogsDO);
+            // update pv, uv, uip
             baseMapper.incrementStats(gid, fullShortUrl, 1, uvFirstFlag.get() ? 1 : 0, uipFirstFlag ? 1 : 0);
+            // today statistic
+            // optimize: use a new boolean instead of uvFirstFlag
+            // AtomicBoolean uvTodayFirstFlag = new AtomicBoolean();
+            // Long uvTodayAdd = stringRedisTemplate.opsForSet().add("short-link:stats:uv:" + DateUtil.formatDate(date) + ":" + fullShortUrl, uv.get(), the time to the end of the day);
+            // uvTodayFirstFlag.set(uvTodayAdd != null && uvTodayAdd > 0L);
+            LinkStatsTodayDO linkStatsTodayDO = LinkStatsTodayDO.builder()
+                    .todayPv(1)
+                    .todayUv(uvFirstFlag.get() ? 1 : 0)
+                    .todayUip(uipFirstFlag ? 1 : 0)
+                    .gid(gid)
+                    .fullShortUrl(fullShortUrl)
+                    .date(new Date())
+                    .build();
+            linkTodayStatsMapper.shortLinkTodayState(linkStatsTodayDO);
         } catch (Throwable ex) {
-            log.error("short link access static exception", ex);
+            log.error("short link access statistic exception", ex);
         }
     }
 

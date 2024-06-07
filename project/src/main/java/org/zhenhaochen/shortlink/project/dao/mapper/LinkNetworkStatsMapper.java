@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.zhenhaochen.shortlink.project.dao.entity.LinkNetworkStatsDO;
+import org.zhenhaochen.shortlink.project.dto.req.ShortLinkGroupStatsReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkStatsReqDTO;
 
 import java.util.List;
@@ -57,5 +58,20 @@ public interface LinkNetworkStatsMapper extends BaseMapper<LinkNetworkStatsDO> {
             "GROUP BY " +
             "    full_short_url, gid, network;")
     List<LinkNetworkStatsDO> listNetworkStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
+
+    /**
+     * get a group of network monitor statistic between specified dates
+     */
+    @Select("SELECT " +
+            "    network, " +
+            "    SUM(cnt) AS cnt " +
+            "FROM " +
+            "    t_link_network_stats " +
+            "WHERE " +
+            "    gid = #{param.gid} " +
+            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "GROUP BY " +
+            "    gid, network;")
+    List<LinkNetworkStatsDO> listNetworkStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
 }
 

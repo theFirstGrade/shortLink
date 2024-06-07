@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.zhenhaochen.shortlink.project.dao.entity.LinkAccessStatsDO;
+import org.zhenhaochen.shortlink.project.dto.req.ShortLinkGroupStatsReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkStatsReqDTO;
 
 import java.util.List;
@@ -69,7 +70,24 @@ public interface LinkAccessStatsMapper extends BaseMapper<LinkAccessStatsDO> {
     List<LinkAccessStatsDO> listStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
 
     /**
-     * get basic monitor statistic between specified hours
+     * get a group of basic monitor statistic between specified dates
+     */
+    @Select("SELECT " +
+            "    date, " +
+            "    SUM(pv) AS pv, " +
+            "    SUM(uv) AS uv, " +
+            "    SUM(uip) AS uip " +
+            "FROM " +
+            "    t_link_access_stats " +
+            "WHERE " +
+            "    gid = #{param.gid} " +
+            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "GROUP BY " +
+            "    gid, date;")
+    List<LinkAccessStatsDO> listStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
+
+    /**
+     * get basic hour statistic between specified hours
      */
     @Select("SELECT " +
             "    hour, " +
@@ -85,7 +103,22 @@ public interface LinkAccessStatsMapper extends BaseMapper<LinkAccessStatsDO> {
     List<LinkAccessStatsDO> listHourStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
 
     /**
-     * get basic monitor statistic between specified weekday
+     * get a group of hour monitor statistic between specified hours
+     */
+    @Select("SELECT " +
+            "    hour, " +
+            "    SUM(pv) AS pv " +
+            "FROM " +
+            "    t_link_access_stats " +
+            "WHERE " +
+            "    gid = #{param.gid} " +
+            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "GROUP BY " +
+            "    gid, hour;")
+    List<LinkAccessStatsDO> listHourStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
+
+    /**
+     * get weekday monitor statistic between specified weekday
      */
     @Select("SELECT " +
             "    weekday, " +
@@ -99,4 +132,19 @@ public interface LinkAccessStatsMapper extends BaseMapper<LinkAccessStatsDO> {
             "GROUP BY " +
             "    full_short_url, gid, weekday;")
     List<LinkAccessStatsDO> listWeekdayStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
+
+    /**
+     * get a group of weekday monitor statistic between specified weekday
+     */
+    @Select("SELECT " +
+            "    weekday, " +
+            "    SUM(pv) AS pv " +
+            "FROM " +
+            "    t_link_access_stats " +
+            "WHERE " +
+            "    gid = #{param.gid} " +
+            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "GROUP BY " +
+            "    gid, weekday;")
+    List<LinkAccessStatsDO> listWeekdayStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
 }

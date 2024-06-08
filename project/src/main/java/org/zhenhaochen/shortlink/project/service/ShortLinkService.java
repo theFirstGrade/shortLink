@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import org.zhenhaochen.shortlink.project.dao.entity.ShortLinkDO;
+import org.zhenhaochen.shortlink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
+import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkPageRespDTO;
@@ -25,6 +27,11 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
      * @return short link information
      */
     ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam);
+
+    /**
+     * batch create short link
+     */
+    ShortLinkBatchCreateRespDTO batchCreateShortLink(ShortLinkBatchCreateReqDTO requestParam);
 
     /**
      * update short link

@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.zhenhaochen.shortlink.project.common.convention.result.Result;
 import org.zhenhaochen.shortlink.project.common.convention.result.Results;
+import org.zhenhaochen.shortlink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
+import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.zhenhaochen.shortlink.project.dto.resp.ShortLinkPageRespDTO;
@@ -40,6 +42,14 @@ public class ShortLinkController {
     @PostMapping("/api/short-link/v1/create")
     public Result<ShortLinkCreateRespDTO> createShortLink(@RequestBody ShortLinkCreateReqDTO requestParam) {
         return Results.success(shortLinkService.createShortLink(requestParam));
+    }
+
+    /**
+     * batch create short link
+     */
+    @PostMapping("/api/short-link/v1/create/batch")
+    public Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO requestParam) {
+        return Results.success(shortLinkService.batchCreateShortLink(requestParam));
     }
 
     /**

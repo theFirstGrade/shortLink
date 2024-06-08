@@ -1,31 +1,26 @@
 package org.zhenhaochen.shortlink.project.dto.req;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 /**
- * Short Link Creation Request Object
+ * Batch Create Short Link Object
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class ShortLinkCreateReqDTO {
+public class ShortLinkBatchCreateReqDTO {
 
     /**
-     * domain name
+     * original url list
      */
-    private String domain;
+    private List<String> originUrls;
 
     /**
-     * origin url
+     * description list
      */
-    private String originUrl;
+    private List<String> descriptions;
 
     /**
      * gid
@@ -47,9 +42,4 @@ public class ShortLinkCreateReqDTO {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/New_York")
     private Date validDate;
-
-    /**
-     * description
-     */
-    private String description;
 }

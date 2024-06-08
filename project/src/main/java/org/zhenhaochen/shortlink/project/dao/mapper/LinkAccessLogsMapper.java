@@ -57,13 +57,15 @@ public interface LinkAccessLogsMapper extends BaseMapper<LinkAccessLogsDO> {
 
     /**
      * get old/new visitor statistic between specified dates
+     * visitors with more than one access and are between specified dates are old users
+     * visitors with one access and are between specified dates are new users
      */
     @Select("SELECT " +
             "    SUM(old_user) AS oldUserCnt, " +
             "    SUM(new_user) AS newUserCnt " +
             "FROM ( " +
             "    SELECT " +
-            "        CASE WHEN COUNT(DISTINCT DATE(create_time)) > 1 THEN 1 ELSE 0 END AS old_user, " +
+            "        CASE WHEN COUNT(DISTINCT DATE(create_time)) > 1 AND MAX(create_time) >= #{param.startDate} AND MAX(create_time) <= #{param.endDate} + INTERVAL 1 DAY THEN 1 ELSE 0 END AS old_user, " +
             "        CASE WHEN COUNT(DISTINCT DATE(create_time)) = 1 AND MAX(create_time) >= #{param.startDate} AND MAX(create_time) <= #{param.endDate} + INTERVAL 1 DAY THEN 1 ELSE 0 END AS new_user " +
             "    FROM " +
             "        t_link_access_logs " +
@@ -77,6 +79,7 @@ public interface LinkAccessLogsMapper extends BaseMapper<LinkAccessLogsDO> {
 
     /**
      * judge visitor type
+     * if the minimum create time is between specified dates then new visitor
      */
     @Select("<script> " +
             "SELECT " +

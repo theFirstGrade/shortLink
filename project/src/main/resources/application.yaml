@@ -16,6 +16,8 @@ spring:
       suffix: .html
 
 short-link:
+  domain:
+    default: nurl.ink:8001
   stats:
     locale:
       IPInfo-key: e140f5cce7ad5a

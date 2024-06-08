@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zhenhaochen.shortlink.project.common.convention.result.Result;
 import org.zhenhaochen.shortlink.project.common.convention.result.Results;
+import org.zhenhaochen.shortlink.project.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkGroupStatsReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkStatsReqDTO;
@@ -45,4 +46,13 @@ public class ShortLinkStatsController {
     public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
         return Results.success(shortLinkStatsService.shortLinkStatsAccessRecord(requestParam));
     }
+
+    /**
+     * paging query group statistic between specified dates
+     */
+    @GetMapping("/api/short-link/v1/stats/access-record/group")
+    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        return Results.success(shortLinkStatsService.groupShortLinkStatsAccessRecord(requestParam));
+    }
+
 }

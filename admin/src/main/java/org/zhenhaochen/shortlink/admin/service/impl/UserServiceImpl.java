@@ -1,6 +1,7 @@
 package org.zhenhaochen.shortlink.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.UUID;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -26,6 +27,7 @@ import org.zhenhaochen.shortlink.admin.dto.resp.UserRespDTO;
 import org.zhenhaochen.shortlink.admin.service.GroupService;
 import org.zhenhaochen.shortlink.admin.service.UserService;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.zhenhaochen.shortlink.admin.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
@@ -105,11 +107,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         if (userDO == null) {
             throw new ClientException("user does not exist");
         }
-        Boolean hasLogin = stringRedisTemplate.hasKey("login_" + requestParam.getUsername());
-        if (hasLogin != null && hasLogin) {
-            throw new ClientException("user has already logged in");
+        Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries("login_" + requestParam.getUsername());
+        if (CollUtil.isNotEmpty(hasLoginMap)) {
+            String token = hasLoginMap.keySet().stream()
+                    .findFirst()
+                    .map(Object::toString)
+                    .orElseThrow(() -> new ClientException("login failed"));
+            return new UserLoginRespDTO(token);
         }
-        /**
+        /*
          * Hash
          * Key：login_username
          * Value：

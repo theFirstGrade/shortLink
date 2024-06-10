@@ -22,6 +22,11 @@ public class ShortLinkUpdateReqDTO {
     private String fullShortUrl;
 
     /**
+     * original gid
+     */
+    private String originGid;
+
+    /**
      * gid
      */
     private String gid;

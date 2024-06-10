@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import org.zhenhaochen.shortlink.project.dao.entity.ShortLinkDO;
+import org.zhenhaochen.shortlink.project.dto.bit.ShortLinkStatsRecordDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkPageReqDTO;
@@ -58,4 +59,14 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
      * @param response HTTP response
      */
     void restoreUrl(String shortUri, ServletRequest request, ServletResponse response);
+
+    /**
+     * short link statistic
+     *
+     * @param fullShortUrl         full short link
+     * @param gid                  gid
+     * @param shortLinkStatsRecord short link statistic Entity
+     */
+    void shortLinkStats(String fullShortUrl, String gid, ShortLinkStatsRecordDTO shortLinkStatsRecord);
+
 }

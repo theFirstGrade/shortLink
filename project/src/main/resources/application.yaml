@@ -21,6 +21,15 @@ short-link:
   stats:
     locale:
       IPInfo-key: e140f5cce7ad5a
+  goto-domain:
+    white-list:
+      enable: false
+      names: 'nage offer,zhihu,google,baidu'
+      details:
+        - nageoffer.com
+        - zhihu.com
+        - google.com
+        - baidu.com
 
 mybatis-plus:
   configuration:

@@ -1,4 +1,4 @@
-package org.zhenhaochen.shortlink.project.common.config;
+package org.zhenhaochen.shortlink.project.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

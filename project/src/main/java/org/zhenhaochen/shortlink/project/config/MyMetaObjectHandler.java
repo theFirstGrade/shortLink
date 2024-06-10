@@ -1,4 +1,4 @@
-package org.zhenhaochen.shortlink.project.common.config;
+package org.zhenhaochen.shortlink.project.config;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;

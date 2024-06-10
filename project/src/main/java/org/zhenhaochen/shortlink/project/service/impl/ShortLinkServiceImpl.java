@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.zhenhaochen.shortlink.project.common.convention.exception.ClientException;
 import org.zhenhaochen.shortlink.project.common.convention.exception.ServerException;
 import org.zhenhaochen.shortlink.project.common.enums.VailDateTypeEnum;
+import org.zhenhaochen.shortlink.project.config.DomainWhiteListConfiguration;
 import org.zhenhaochen.shortlink.project.dao.entity.*;
 import org.zhenhaochen.shortlink.project.dao.mapper.*;
 import org.zhenhaochen.shortlink.project.dto.bit.ShortLinkStatsRecordDTO;
@@ -85,6 +86,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkStatsTodayMapper linkTodayStatsMapper;
     private final LinkStatsTodayService linkStatsTodayService;
     private final DelayShortLinkStatsProducer delayShortLinkStatsProducer;
+    private final DomainWhiteListConfiguration domainWhiteListConfiguration;
 
     @Value("${short-link.stats.locale.IPInfo-key}")
     private String statsLocaleIPInfoKey;
@@ -94,6 +96,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
+        verificationWhitelist(requestParam.getOriginUrl());
         String shortLinkSuffix = generateSuffix(requestParam);
         String fullShortUrl = StrBuilder.create(createShortLinkDefaultDomain)
                 .append("/")
@@ -170,6 +173,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateShortLink(ShortLinkUpdateReqDTO requestParam) {
+        verificationWhitelist(requestParam.getOriginUrl());
         LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
                 .eq(ShortLinkDO::getGid, requestParam.getOriginGid())
                 .eq(ShortLinkDO::getFullShortUrl, requestParam.getFullShortUrl())
@@ -618,18 +622,37 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     @SneakyThrows
     private String getFavicon(String url) {
-        URL targetUrl = new URL(url);
-        HttpURLConnection connection = (HttpURLConnection) targetUrl.openConnection();
-        connection.setRequestMethod("GET");
-        connection.connect();
-        int responseCode = connection.getResponseCode();
-        if (HttpURLConnection.HTTP_OK == responseCode) {
-            Document document = Jsoup.connect(url).get();
-            Element faviconLink = document.select("link[rel~=(?i)^(shortcut )?icon]").first();
-            if (faviconLink != null) {
-                return faviconLink.attr("abs:href");
+        try {
+            URL targetUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) targetUrl.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
+            int responseCode = connection.getResponseCode();
+            if (HttpURLConnection.HTTP_OK == responseCode) {
+                Document document = Jsoup.connect(url).get();
+                Element faviconLink = document.select("link[rel~=(?i)^(shortcut )?icon]").first();
+                if (faviconLink != null) {
+                    return faviconLink.attr("abs:href");
+                }
             }
+        } catch (Exception e) {
+            throw new ClientException("can not get the favicon");
         }
         return null;
+    }
+
+    private void verificationWhitelist(String originUrl) {
+        Boolean enable = domainWhiteListConfiguration.getEnable();
+        if (enable == null || !enable) {
+            return;
+        }
+        String domain = LinkUtil.extractDomain(originUrl);
+        if (StrUtil.isBlank(domain)) {
+            throw new ClientException("wrong format of short link");
+        }
+        List<String> details = domainWhiteListConfiguration.getDetails();
+        if (!details.contains(domain)) {
+            throw new ClientException("following domains are allowed: " + domainWhiteListConfiguration.getNames());
+        }
     }
 }

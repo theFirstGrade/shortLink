@@ -1,4 +1,4 @@
-package org.zhenhaochen.shortlink.project.common.config;
+package org.zhenhaochen.shortlink.project.config;
 
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RedissonClient;

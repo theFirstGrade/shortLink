@@ -6,15 +6,13 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.ipinfo.api.IPinfo;
-import io.ipinfo.api.errors.RateLimitedException;
-import io.ipinfo.api.model.IPResponse;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
@@ -47,7 +45,7 @@ import org.zhenhaochen.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.resp.*;
-import org.zhenhaochen.shortlink.project.mq.producer.DelayShortLinkStatsProducer;
+import org.zhenhaochen.shortlink.project.mq.producer.ShortLinkStatsSaveProducer;
 import org.zhenhaochen.shortlink.project.service.LinkStatsTodayService;
 import org.zhenhaochen.shortlink.project.service.ShortLinkService;
 import org.zhenhaochen.shortlink.project.toolkit.HashUtil;
@@ -55,8 +53,6 @@ import org.zhenhaochen.shortlink.project.toolkit.LinkUtil;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -85,7 +81,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkNetworkStatsMapper linkNetworkStatsMapper;
     private final LinkStatsTodayMapper linkTodayStatsMapper;
     private final LinkStatsTodayService linkStatsTodayService;
-    private final DelayShortLinkStatsProducer delayShortLinkStatsProducer;
+    private final ShortLinkStatsSaveProducer shortLinkStatsSaveProducer;
     private final DomainWhiteListConfiguration domainWhiteListConfiguration;
 
     @Value("${short-link.stats.locale.IPInfo-key}")
@@ -359,7 +355,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     @SneakyThrows
     @Override
     public void restoreUrl(String shortUri, ServletRequest request, ServletResponse response) {
-
         String serverName = request.getServerName();
         String serverPort = Optional.of(request.getServerPort())
                 .filter(each -> !Objects.equals(each, 80))
@@ -475,131 +470,11 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     @Override
     public void shortLinkStats(String fullShortUrl, String gid, ShortLinkStatsRecordDTO statsRecord) {
-
-        fullShortUrl = Optional.ofNullable(fullShortUrl).orElse(statsRecord.getFullShortUrl());
-        RReadWriteLock readWriteLock = redissonClient.getReadWriteLock(String.format(LOCK_GID_UPDATE_KEY, fullShortUrl));
-        RLock rLock = readWriteLock.readLock();
-        if (!rLock.tryLock()) {
-            delayShortLinkStatsProducer.send(statsRecord);
-            return;
-        }
-        try {
-            if (StrUtil.isBlank(gid)) {
-                LambdaQueryWrapper<ShortLinkGotoDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
-                        .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
-                ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(queryWrapper);
-                gid = shortLinkGotoDO.getGid();
-            }
-            Date date = new Date();
-            int hourOfDay = LocalTime.now().getHour();
-            int dayOfWeek = LocalDate.now().getDayOfWeek().getValue();
-            LinkAccessStatsDO linkAccessStatsDO = LinkAccessStatsDO.builder()
-                    .pv(1)
-                    .uv(statsRecord.getUvFirstFlag() ? 1 : 0)
-                    .uip(statsRecord.getUipFirstFlag() ? 1 : 0)
-                    .hour(hourOfDay)
-                    .weekday(dayOfWeek)
-                    .fullShortUrl(fullShortUrl)
-                    .gid(gid)
-                    .date(date)
-                    .build();
-            linkAccessStatsMapper.shortLinkStats(linkAccessStatsDO);
-
-            // IPInfo api revoke
-            String actualProvince = "unknown";
-            String actualCity = "unknown";
-            IPinfo ipInfo = new IPinfo.Builder()
-                    .setToken(statsLocaleIPInfoKey)
-                    .build();
-            try {
-                IPResponse IPInfoResponse = ipInfo.lookupIP(statsRecord.getRemoteAddr());
-                if (IPInfoResponse != null) {
-                    boolean unknownFlag = IPInfoResponse.getBogon();
-                    LinkLocaleStatsDO linkLocaleStatsDO = LinkLocaleStatsDO.builder()
-                            .province(actualProvince = unknownFlag ? actualProvince : IPInfoResponse.getRegion())
-                            .city(actualCity = unknownFlag ? actualCity : IPInfoResponse.getCity())
-                            .postal(unknownFlag ? "unknown" : IPInfoResponse.getPostal())
-                            .cnt(1)
-                            .fullShortUrl(fullShortUrl)
-                            .country("US")
-                            .gid(gid)
-                            .date(date)
-                            .build();
-                    linkLocaleStatsMapper.shortLinkLocaleState(linkLocaleStatsDO);
-                }
-            } catch (RateLimitedException ex) {
-                throw new ServerException("IPInfo api went wrong");
-            }
-            // operating system
-            LinkOsStatsDO linkOsStatsDO = LinkOsStatsDO.builder()
-                    .os(statsRecord.getOs())
-                    .cnt(1)
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .date(date)
-                    .build();
-            linkOsStatsMapper.shortLinkOsState(linkOsStatsDO);
-            // browser
-            LinkBrowserStatsDO linkBrowserStatsDO = LinkBrowserStatsDO.builder()
-                    .browser(statsRecord.getBrowser())
-                    .cnt(1)
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .date(date)
-                    .build();
-            linkBrowserStatsMapper.shortLinkBrowserState(linkBrowserStatsDO);
-            // device
-            LinkDeviceStatsDO linkDeviceStatsDO = LinkDeviceStatsDO.builder()
-                    .device(statsRecord.getDevice())
-                    .cnt(1)
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .date(date)
-                    .build();
-            linkDeviceStatsMapper.shortLinkDeviceState(linkDeviceStatsDO);
-            // network
-            LinkNetworkStatsDO linkNetworkStatsDO = LinkNetworkStatsDO.builder()
-                    .network(statsRecord.getNetwork())
-                    .cnt(1)
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .date(date)
-                    .build();
-            linkNetworkStatsMapper.shortLinkNetworkState(linkNetworkStatsDO);
-            // logs
-            LinkAccessLogsDO linkAccessLogsDO = LinkAccessLogsDO.builder()
-                    .user(statsRecord.getUv())
-                    .ip(statsRecord.getRemoteAddr())
-                    .browser(statsRecord.getBrowser())
-                    .os(statsRecord.getOs())
-                    .network(statsRecord.getNetwork())
-                    .device(statsRecord.getDevice())
-                    .locale(StrUtil.join("-", "US", actualProvince, actualCity))
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .build();
-            linkAccessLogsMapper.insert(linkAccessLogsDO);
-            // update pv, uv, uip
-            baseMapper.incrementStats(gid, fullShortUrl, 1, statsRecord.getUvFirstFlag() ? 1 : 0, statsRecord.getUipFirstFlag() ? 1 : 0);
-            // today statistic
-            // optimize: use a new boolean instead of uvFirstFlag
-            // AtomicBoolean uvTodayFirstFlag = new AtomicBoolean();
-            // Long uvTodayAdd = stringRedisTemplate.opsForSet().add("short-link:stats:uv:" + DateUtil.formatDate(date) + ":" + fullShortUrl, uv.get(), the time to the end of the day);
-            // uvTodayFirstFlag.set(uvTodayAdd != null && uvTodayAdd > 0L);
-            LinkStatsTodayDO linkStatsTodayDO = LinkStatsTodayDO.builder()
-                    .todayPv(1)
-                    .todayUv(statsRecord.getUvFirstFlag() ? 1 : 0)
-                    .todayUip(statsRecord.getUipFirstFlag() ? 1 : 0)
-                    .gid(gid)
-                    .fullShortUrl(fullShortUrl)
-                    .date(date)
-                    .build();
-            linkTodayStatsMapper.shortLinkTodayState(linkStatsTodayDO);
-        } catch (Throwable ex) {
-            log.error("short link access statistic exception", ex);
-        } finally {
-            rLock.unlock();
-        }
+        Map<String, String> producerMap = new HashMap<>();
+        producerMap.put("fullShortUrl", fullShortUrl);
+        producerMap.put("gid", gid);
+        producerMap.put("statsRecord", JSON.toJSONString(statsRecord));
+        shortLinkStatsSaveProducer.send(producerMap);
     }
 
     private String generateSuffix(ShortLinkCreateReqDTO requestParam) {

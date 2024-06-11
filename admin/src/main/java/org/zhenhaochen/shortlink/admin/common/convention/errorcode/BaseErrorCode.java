@@ -22,6 +22,9 @@ public enum BaseErrorCode implements IErrorCode {
     IDEMPOTENT_TOKEN_NULL_ERROR("A000200", "Idempotent Token is null"),
     IDEMPOTENT_TOKEN_DELETE_ERROR("A000201", "Idempotent Token has been used or expired"),
 
+    // ========== Second-level macro error code request too frequently ==========
+    FLOW_LIMIT_ERROR("A000300", "request too frequently"),
+
     // ========== Top-level macro error code System Execution Errors ==========
     SERVICE_ERROR("B000001", "System execution error"),
     // ========== Second-level macro error code System Execution Timeout ==========

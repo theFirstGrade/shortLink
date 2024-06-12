@@ -90,6 +90,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     @Value("${short-link.domain.default}")
     private String createShortLinkDefaultDomain;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
         verificationWhitelist(requestParam.getOriginUrl());
@@ -124,7 +125,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             shortLinkGotoMapper.insert(linkGotoDO);
         } catch (DuplicateKeyException ex) {
             log.warn("short link: {} duplicate short link", fullShortUrl);
-            throw new ServerException("generate duplicate short link");
+            throw new ServerException(String.format("short link: %s duplicate ", fullShortUrl));
         }
         stringRedisTemplate.opsForValue().set(
                 String.format(GOTO_SHORT_LINK_KEY, fullShortUrl),

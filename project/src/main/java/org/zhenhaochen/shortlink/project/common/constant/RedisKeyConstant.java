@@ -8,25 +8,36 @@ public class RedisKeyConstant {
     /**
      * short link redirect key prefix
      */
-    public static final String GOTO_SHORT_LINK_KEY = "short-link_goto_%s";
+    public static final String GOTO_SHORT_LINK_KEY = "short-link:goto:%s";
 
     /**
      * used for short link that is misjudged by BloomFilter
      */
-    public static final String GOTO_IS_NULL_SHORT_LINK_KEY = "short-link_is-null_goto_%s";
+    public static final String GOTO_IS_NULL_SHORT_LINK_KEY = "short-link:is-null:goto_%s";
 
     /**
      * short link redirect lock key prefix
      */
-    public static final String LOCK_GOTO_SHORT_LINK_KEY = "short-link_lock_goto_%s";
+    public static final String LOCK_GOTO_SHORT_LINK_KEY = "short-link:lock:goto:%s";
 
     /**
      * readWriteLock prefix - update gid
      */
-    public static final String LOCK_GID_UPDATE_KEY = "short-link_lock_update-gid_%s";
+    public static final String LOCK_GID_UPDATE_KEY = "short-link:lock:update-gid:%s";
 
     /**
      * redisson delay queue Key
      */
-    public static final String DELAY_QUEUE_STATS_KEY = "short-link_delay-queue:stats";
+    public static final String DELAY_QUEUE_STATS_KEY = "short-link:delay-queue:stats";
+
+    /**
+     * user uv flag
+     */
+    public static final String SHORT_LINK_STATS_UV_KEY = "short-link:stats:uv:";
+
+    /**
+     * user uip flag
+     */
+    public static final String SHORT_LINK_STATS_UIP_KEY = "short-link:stats:uip:";
+
 }

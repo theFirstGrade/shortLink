@@ -40,4 +40,13 @@ public class RedisKeyConstant {
      */
     public static final String SHORT_LINK_STATS_UIP_KEY = "short-link:stats:uip:";
 
+    /**
+     * message queue Topic key
+     */
+    public static final String SHORT_LINK_STATS_STREAM_TOPIC_KEY = "short-link:stats-stream";
+
+    /**
+     * message queue Group key
+     */
+    public static final String SHORT_LINK_STATS_STREAM_GROUP_KEY = "short-link:stats-stream:only-group";
 }

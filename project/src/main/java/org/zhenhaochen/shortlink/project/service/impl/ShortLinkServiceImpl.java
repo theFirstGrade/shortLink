@@ -39,7 +39,7 @@ import org.zhenhaochen.shortlink.project.common.enums.VailDateTypeEnum;
 import org.zhenhaochen.shortlink.project.config.DomainWhiteListConfiguration;
 import org.zhenhaochen.shortlink.project.dao.entity.*;
 import org.zhenhaochen.shortlink.project.dao.mapper.*;
-import org.zhenhaochen.shortlink.project.dto.bit.ShortLinkStatsRecordDTO;
+import org.zhenhaochen.shortlink.project.dto.biz.ShortLinkStatsRecordDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkPageReqDTO;

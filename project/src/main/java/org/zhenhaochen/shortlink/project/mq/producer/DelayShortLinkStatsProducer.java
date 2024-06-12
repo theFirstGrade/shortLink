@@ -1,11 +1,12 @@
 package org.zhenhaochen.shortlink.project.mq.producer;
 
+import cn.hutool.core.lang.UUID;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBlockingDeque;
 import org.redisson.api.RDelayedQueue;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
-import org.zhenhaochen.shortlink.project.dto.bit.ShortLinkStatsRecordDTO;
+import org.zhenhaochen.shortlink.project.dto.biz.ShortLinkStatsRecordDTO;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,6 +27,7 @@ public class DelayShortLinkStatsProducer {
      * @param statsRecord Short Link Statistic Entity
      */
     public void send(ShortLinkStatsRecordDTO statsRecord) {
+        statsRecord.setKeys(UUID.fastUUID().toString());
         RBlockingDeque<ShortLinkStatsRecordDTO> blockingDeque = redissonClient.getBlockingDeque(DELAY_QUEUE_STATS_KEY);
         RDelayedQueue<ShortLinkStatsRecordDTO> delayedQueue = redissonClient.getDelayedQueue(blockingDeque);
         delayedQueue.offer(statsRecord, 5, TimeUnit.SECONDS);

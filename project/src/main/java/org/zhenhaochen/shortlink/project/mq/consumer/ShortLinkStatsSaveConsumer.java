@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 import org.zhenhaochen.shortlink.project.common.convention.exception.ServerException;
 import org.zhenhaochen.shortlink.project.dao.entity.*;
 import org.zhenhaochen.shortlink.project.dao.mapper.*;
-import org.zhenhaochen.shortlink.project.dto.bit.ShortLinkStatsRecordDTO;
+import org.zhenhaochen.shortlink.project.dto.biz.ShortLinkStatsRecordDTO;
 import org.zhenhaochen.shortlink.project.mq.idempotent.MessageQueueIdempotentHandler;
 import org.zhenhaochen.shortlink.project.mq.producer.DelayShortLinkStatsProducer;
 

@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import org.zhenhaochen.shortlink.project.dao.entity.ShortLinkDO;
-import org.zhenhaochen.shortlink.project.dto.bit.ShortLinkStatsRecordDTO;
+import org.zhenhaochen.shortlink.project.dto.biz.ShortLinkStatsRecordDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkPageReqDTO;

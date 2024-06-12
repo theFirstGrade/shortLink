@@ -1,4 +1,4 @@
-package org.zhenhaochen.shortlink.project.dto.bit;
+package org.zhenhaochen.shortlink.project.dto.biz;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -58,4 +58,9 @@ public class ShortLinkStatsRecordDTO {
      * uip flag
      */
     private Boolean uipFirstFlag;
+
+    /**
+     * message queue unique id
+     */
+    private String keys;
 }

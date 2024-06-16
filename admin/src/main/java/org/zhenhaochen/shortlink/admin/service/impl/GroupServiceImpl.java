@@ -19,7 +19,7 @@ import org.zhenhaochen.shortlink.admin.dao.mapper.GroupMapper;
 import org.zhenhaochen.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
-import org.zhenhaochen.shortlink.admin.remote.ShortLinkRemoteService;
+import org.zhenhaochen.shortlink.admin.remote.ShortLinkActualRemoteService;
 import org.zhenhaochen.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.zhenhaochen.shortlink.admin.service.GroupService;
 import org.zhenhaochen.shortlink.admin.toolkit.RandomGenerator;
@@ -34,16 +34,11 @@ import static org.zhenhaochen.shortlink.admin.common.constant.RedisCacheConstant
 @RequiredArgsConstructor
 public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implements GroupService {
 
+    private final ShortLinkActualRemoteService shortLinkActualRemoteService;
     private final RedissonClient redissonClient;
 
     @Value("${short-link.group.max-num}")
     private Integer groupMaxNum;
-
-    /**
-     * rebuild SpringCloud later
-     */
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
 
     @Override
     public void saveGroup(String groupName) {
@@ -85,7 +80,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
                 .eq(GroupDO::getDelFlag, 0)
                 .orderByDesc(List.of(GroupDO::getSortOrder, GroupDO::getUpdateTime));
         List<GroupDO> groupDOList = baseMapper.selectList(queryWrapper);
-        Result<List<ShortLinkGroupCountQueryRespDTO>> listResult = shortLinkRemoteService
+        Result<List<ShortLinkGroupCountQueryRespDTO>> listResult = shortLinkActualRemoteService
                 .listGroupShortLinkCount(groupDOList.stream().map(GroupDO::getGid).toList());
         List<ShortLinkGroupRespDTO> shortLinkGroupRespDTOList = BeanUtil.copyToList(groupDOList, ShortLinkGroupRespDTO.class);
         shortLinkGroupRespDTOList.forEach(each -> {

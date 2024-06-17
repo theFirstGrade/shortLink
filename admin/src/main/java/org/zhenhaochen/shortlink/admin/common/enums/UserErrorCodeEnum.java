@@ -4,8 +4,6 @@ import org.zhenhaochen.shortlink.admin.common.convention.errorcode.IErrorCode;
 
 public enum UserErrorCodeEnum implements IErrorCode {
 
-    USER_TOKEN_FAIL("A000200", "token validation failed"),
-
     USER_NULL("B000200", "user record does not exist"),
 
     USER_NAME_EXIST("B000201", "user name already exist"),

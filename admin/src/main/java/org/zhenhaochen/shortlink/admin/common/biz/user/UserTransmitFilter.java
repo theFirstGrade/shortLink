@@ -8,15 +8,11 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-
-import java.util.Objects;
 
 /**
  * User Information Filter
  */
 @RequiredArgsConstructor
-@Slf4j
 public class UserTransmitFilter implements Filter {
 
     @SneakyThrows
@@ -24,12 +20,6 @@ public class UserTransmitFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         String username = httpServletRequest.getHeader("username");
-        System.out.println(httpServletRequest.getHeader("username"));
-        System.out.println(username + " ------ ");
-        if (username == null || Objects.equals(username, "")) {
-            log.error("Username is null");
-        }
-
         if (StrUtil.isNotBlank(username)) {
             String userId = httpServletRequest.getHeader("userId");
             String realName = httpServletRequest.getHeader("realName");

@@ -19,7 +19,7 @@ import org.zhenhaochen.shortlink.admin.service.RecycleBinService;
 /**
  * Recycle Bin Management Controller
  */
-@RestController
+@RestController(value = "recycleBinControllerByAdmin")
 @RequiredArgsConstructor
 public class RecycleBinController {
 

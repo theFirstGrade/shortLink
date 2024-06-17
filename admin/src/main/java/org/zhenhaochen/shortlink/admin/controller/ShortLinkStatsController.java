@@ -16,7 +16,7 @@ import org.zhenhaochen.shortlink.admin.remote.dto.resp.ShortLinkStatsRespDTO;
 /**
  * Short Link Monitor Controller
  */
-@RestController
+@RestController(value = "shortLinkStatsControllerByAdmin")
 @RequiredArgsConstructor
 public class ShortLinkStatsController {
 

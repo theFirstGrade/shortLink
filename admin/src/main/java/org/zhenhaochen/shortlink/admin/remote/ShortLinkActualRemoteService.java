@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Short Link Admin Remote Revoke
  */
-@FeignClient("short-link-project")
+@FeignClient(value = "short-link-project", url = "${aggregation.remote-url:}")
 public interface ShortLinkActualRemoteService {
 
     /**

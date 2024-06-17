@@ -10,7 +10,7 @@ import org.zhenhaochen.shortlink.admin.remote.ShortLinkActualRemoteService;
 /**
  * URL Title Controller
  */
-@RestController
+@RestController(value = "urlTitleControllerByAdmin")
 @RequiredArgsConstructor
 public class UrlTitleController {
 

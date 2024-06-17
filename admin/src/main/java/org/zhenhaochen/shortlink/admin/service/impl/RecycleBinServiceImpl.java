@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * URL Recycle Bin Interface Implementation Layer
  */
-@Service
+@Service(value = "recycleBinServiceImplByAdmin")
 @RequiredArgsConstructor
 public class RecycleBinServiceImpl implements RecycleBinService {
 

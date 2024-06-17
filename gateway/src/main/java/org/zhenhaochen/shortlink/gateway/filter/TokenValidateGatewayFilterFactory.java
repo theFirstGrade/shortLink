@@ -10,8 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.zhenhaochen.shortlink.gateway.config.Config;
 import org.zhenhaochen.shortlink.gateway.dto.GatewayErrorResult;
 import reactor.core.publisher.Mono;
@@ -20,6 +20,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * SpringCloud Gateway Token 拦截器
@@ -50,6 +51,7 @@ public class TokenValidateGatewayFilterFactory extends AbstractGatewayFilterFact
                         httpHeaders.set("userId", userInfoJsonObject.getString("id"));
                         httpHeaders.set("realName", URLEncoder.encode(userInfoJsonObject.getString("realName"), StandardCharsets.UTF_8));
                     });
+                    stringRedisTemplate.expire("short-link:login:" + username, 2L, TimeUnit.HOURS);
                     return chain.filter(exchange.mutate().request(builder.build()).build());
                 }
                 ServerHttpResponse response = exchange.getResponse();

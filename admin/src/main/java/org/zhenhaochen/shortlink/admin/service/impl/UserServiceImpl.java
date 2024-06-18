@@ -16,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.zhenhaochen.shortlink.admin.common.biz.user.UserContext;
 import org.zhenhaochen.shortlink.admin.common.convention.exception.ClientException;
 import org.zhenhaochen.shortlink.admin.dao.entity.UserDO;
 import org.zhenhaochen.shortlink.admin.dao.mapper.UserMapper;
@@ -28,6 +29,7 @@ import org.zhenhaochen.shortlink.admin.service.GroupService;
 import org.zhenhaochen.shortlink.admin.service.UserService;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static org.zhenhaochen.shortlink.admin.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
@@ -89,7 +91,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
     @Override
     public void update(UserUpdateReqDTO requestParam) {
-        // TODO verify if the username belongs to the current user
+        if (!Objects.equals(requestParam.getUsername(), UserContext.getUsername())) {
+            throw new ClientException("update request failed");
+        }
         LambdaUpdateWrapper<UserDO> updateWrapper = Wrappers.lambdaUpdate(UserDO.class)
                 .eq(UserDO::getUsername, requestParam.getUsername());
         baseMapper.update(BeanUtil.toBean(requestParam, UserDO.class), updateWrapper);

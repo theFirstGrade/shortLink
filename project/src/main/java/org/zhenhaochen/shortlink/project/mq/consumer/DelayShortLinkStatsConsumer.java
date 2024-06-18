@@ -1,6 +1,5 @@
 package org.zhenhaochen.shortlink.project.mq.consumer;
 
-import com.google.protobuf.ServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBlockingDeque;
@@ -8,6 +7,7 @@ import org.redisson.api.RDelayedQueue;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
+import org.zhenhaochen.shortlink.project.common.convention.exception.ServerException;
 import org.zhenhaochen.shortlink.project.dto.biz.ShortLinkStatsRecordDTO;
 import org.zhenhaochen.shortlink.project.mq.idempotent.MessageQueueIdempotentHandler;
 import org.zhenhaochen.shortlink.project.service.ShortLinkService;
@@ -20,6 +20,7 @@ import static org.zhenhaochen.shortlink.project.common.constant.RedisKeyConstant
 /**
  * Delay Record Short Link Statistics Component
  */
+@Deprecated
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -48,7 +49,7 @@ public class DelayShortLinkStatsConsumer implements InitializingBean {
                                     if (messageQueueIdempotentHandler.isAccomplished(statsRecord.getKeys())) {
                                         return;
                                     }
-                                    throw new ServiceException("the message is processed but not accomplished, message queue will retry");
+                                    throw new ServerException("the message is processed but not accomplished, message queue will retry");
                                 }
                                 try {
                                     shortLinkService.shortLinkStats(null, null, statsRecord);

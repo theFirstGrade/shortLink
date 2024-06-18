@@ -16,6 +16,7 @@ import static org.zhenhaochen.shortlink.project.common.constant.RedisKeyConstant
  * Delayed Consumption Short Link Statistics Sender
  */
 @Component
+@Deprecated
 @RequiredArgsConstructor
 public class DelayShortLinkStatsProducer {
 

@@ -30,6 +30,11 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
     ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam);
 
     /**
+     * create short link by distributed lock
+     */
+    ShortLinkCreateRespDTO createShortLinkByLock(ShortLinkCreateReqDTO requestParam);
+
+    /**
      * batch create short link
      */
     ShortLinkBatchCreateRespDTO batchCreateShortLink(ShortLinkBatchCreateReqDTO requestParam);

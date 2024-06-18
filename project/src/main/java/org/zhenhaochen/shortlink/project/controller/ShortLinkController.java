@@ -52,6 +52,14 @@ public class ShortLinkController {
     }
 
     /**
+     * create short link by distributed lock
+     */
+    @PostMapping("/api/short-link/v1/create/by-lock")
+    public Result<ShortLinkCreateRespDTO> createShortLinkByLock(@RequestBody ShortLinkCreateReqDTO requestParam) {
+        return Results.success(shortLinkService.createShortLinkByLock(requestParam));
+    }
+
+    /**
      * batch create short link
      */
     @PostMapping("/api/short-link/v1/create/batch")

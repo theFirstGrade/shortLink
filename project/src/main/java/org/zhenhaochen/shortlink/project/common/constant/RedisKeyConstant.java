@@ -49,4 +49,9 @@ public class RedisKeyConstant {
      * message queue Group key
      */
     public static final String SHORT_LINK_STATS_STREAM_GROUP_KEY = "short-link:stats-stream:only-group";
+
+    /**
+     * short link creation lock
+     */
+    public static final String SHORT_LINK_CREATE_LOCK_KEY = "short-link:lock:create";
 }

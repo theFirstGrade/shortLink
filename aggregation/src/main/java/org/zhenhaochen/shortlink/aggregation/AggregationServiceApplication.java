@@ -11,8 +11,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @EnableDiscoveryClient
 @SpringBootApplication(scanBasePackages = {
 		"org.zhenhaochen.shortlink.admin",
-		"org.zhenhaochen.shortlink.project",
-		"org.zhenhaochen.shortlink.aggregation"
+		"org.zhenhaochen.shortlink.project"
 })
 @MapperScan(value = {
 		"org.zhenhaochen.shortlink.project.dao.mapper",

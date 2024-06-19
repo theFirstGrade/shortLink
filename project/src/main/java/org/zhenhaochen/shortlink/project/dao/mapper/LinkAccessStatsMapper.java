@@ -21,7 +21,6 @@ public interface LinkAccessStatsMapper extends BaseMapper<LinkAccessStatsDO> {
     @Insert("""
             INSERT INTO t_link_access_stats (
                 full_short_url, 
-                gid, 
                 date, 
                 pv, 
                 uv, 
@@ -33,7 +32,6 @@ public interface LinkAccessStatsMapper extends BaseMapper<LinkAccessStatsDO> {
                 del_flag
             ) VALUES (
                 #{linkAccessStats.fullShortUrl}, 
-                #{linkAccessStats.gid}, 
                 #{linkAccessStats.date}, 
                 #{linkAccessStats.pv}, 
                 #{linkAccessStats.uv}, 
@@ -55,96 +53,114 @@ public interface LinkAccessStatsMapper extends BaseMapper<LinkAccessStatsDO> {
      * get basic monitor statistic between specified dates
      */
     @Select("SELECT " +
-            "    date, " +
-            "    SUM(pv) AS pv, " +
-            "    SUM(uv) AS uv, " +
-            "    SUM(uip) AS uip " +
+            "    tlas.date, " +
+            "    SUM(tlas.pv) AS pv, " +
+            "    SUM(tlas.uv) AS uv, " +
+            "    SUM(tlas.uip) AS uip " +
             "FROM " +
-            "    t_link_access_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_access_stats tlas ON tl.full_short_url = tlas.full_short_url " +
             "WHERE " +
-            "    full_short_url = #{param.fullShortUrl} " +
-            "    AND gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tlas.full_short_url = #{param.fullShortUrl} " +
+            "    AND tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status =  #{param.enableStatus} " +
+            "    AND tlas.date BETWEEN #{param.startDate} and #{param.endDate} " +
             "GROUP BY " +
-            "    full_short_url, gid, date;")
+            "    tlas.full_short_url, tl.gid, tlas.date;")
     List<LinkAccessStatsDO> listStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
 
     /**
      * get a group of basic monitor statistic between specified dates
      */
     @Select("SELECT " +
-            "    date, " +
-            "    SUM(pv) AS pv, " +
-            "    SUM(uv) AS uv, " +
-            "    SUM(uip) AS uip " +
+            "    tlas.date, " +
+            "    SUM(tlas.pv) AS pv, " +
+            "    SUM(tlas.uv) AS uv, " +
+            "    SUM(tlas.uip) AS uip " +
             "FROM " +
-            "    t_link_access_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_access_stats tlas ON tl.full_short_url = tlas.full_short_url " +
             "WHERE " +
-            "    gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status = '0' " +
+            "    AND tlas.date BETWEEN #{param.startDate} and #{param.endDate} " +
             "GROUP BY " +
-            "    gid, date;")
+            "    tl.gid, tlas.date;")
     List<LinkAccessStatsDO> listStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
 
     /**
      * get basic hour statistic between specified hours
      */
     @Select("SELECT " +
-            "    hour, " +
-            "    SUM(pv) AS pv " +
+            "    tlas.hour, " +
+            "    SUM(tlas.pv) AS pv " +
             "FROM " +
-            "    t_link_access_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_access_stats tlas ON tl.full_short_url = tlas.full_short_url " +
             "WHERE " +
-            "    full_short_url = #{param.fullShortUrl} " +
-            "    AND gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tlas.full_short_url = #{param.fullShortUrl} " +
+            "    AND tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status =  #{param.enableStatus} " +
+            "    AND tlas.date BETWEEN #{param.startDate} and #{param.endDate} " +
             "GROUP BY " +
-            "    full_short_url, gid, hour;")
+            "    tlas.full_short_url, tl.gid, tlas.hour;")
     List<LinkAccessStatsDO> listHourStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
 
     /**
      * get a group of hour monitor statistic between specified hours
      */
     @Select("SELECT " +
-            "    hour, " +
-            "    SUM(pv) AS pv " +
+            "    tlas.hour, " +
+            "    SUM(tlas.pv) AS pv " +
             "FROM " +
-            "    t_link_access_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_access_stats tlas ON tl.full_short_url = tlas.full_short_url " +
             "WHERE " +
-            "    gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status = '0' " +
+            "    AND tlas.date BETWEEN #{param.startDate} and #{param.endDate} " +
             "GROUP BY " +
-            "    gid, hour;")
+            "    tl.gid, tlas.hour;")
     List<LinkAccessStatsDO> listHourStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
 
     /**
      * get weekday monitor statistic between specified weekday
      */
     @Select("SELECT " +
-            "    weekday, " +
-            "    SUM(pv) AS pv " +
+            "    tlas.weekday, " +
+            "    SUM(tlas.pv) AS pv " +
             "FROM " +
-            "    t_link_access_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_access_stats tlas ON tl.full_short_url = tlas.full_short_url " +
             "WHERE " +
-            "    full_short_url = #{param.fullShortUrl} " +
-            "    AND gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tlas.full_short_url = #{param.fullShortUrl} " +
+            "    AND tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status =  #{param.enableStatus} " +
+            "    AND tlas.date BETWEEN #{param.startDate} and #{param.endDate} " +
             "GROUP BY " +
-            "    full_short_url, gid, weekday;")
+            "    tlas.full_short_url, tl.gid, tlas.weekday;")
     List<LinkAccessStatsDO> listWeekdayStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
 
     /**
      * get a group of weekday monitor statistic between specified weekday
      */
     @Select("SELECT " +
-            "    weekday, " +
-            "    SUM(pv) AS pv " +
+            "    tlas.weekday, " +
+            "    SUM(tlas.pv) AS pv " +
             "FROM " +
-            "    t_link_access_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_access_stats tlas ON tl.full_short_url = tlas.full_short_url " +
             "WHERE " +
-            "    gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status = '0' " +
+            "    AND tlas.date BETWEEN #{param.startDate} and #{param.endDate} " +
             "GROUP BY " +
-            "    gid, weekday;")
+            "    tl.gid, tlas.weekday;")
     List<LinkAccessStatsDO> listWeekdayStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
 }

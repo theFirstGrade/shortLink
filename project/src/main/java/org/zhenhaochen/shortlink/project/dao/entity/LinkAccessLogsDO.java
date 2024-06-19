@@ -28,11 +28,6 @@ public class LinkAccessLogsDO extends BaseDO {
     private String fullShortUrl;
 
     /**
-     * gid
-     */
-    private String gid;
-
-    /**
      * user information
      */
     private String user;

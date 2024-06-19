@@ -21,7 +21,6 @@ public interface LinkDeviceStatsMapper extends BaseMapper<LinkDeviceStatsDO> {
     @Insert("""
             INSERT INTO t_link_device_stats (
                 full_short_url, 
-                gid, 
                 date, 
                 cnt, 
                 device, 
@@ -30,7 +29,6 @@ public interface LinkDeviceStatsMapper extends BaseMapper<LinkDeviceStatsDO> {
                 del_flag
             ) VALUES (
                 #{linkDeviceStats.fullShortUrl}, 
-                #{linkDeviceStats.gid}, 
                 #{linkDeviceStats.date}, 
                 #{linkDeviceStats.cnt}, 
                 #{linkDeviceStats.device}, 
@@ -47,31 +45,38 @@ public interface LinkDeviceStatsMapper extends BaseMapper<LinkDeviceStatsDO> {
      * get device monitor statistic between specified dates
      */
     @Select("SELECT " +
-            "    device, " +
-            "    SUM(cnt) AS cnt " +
+            "    tlds.device, " +
+            "    SUM(tlds.cnt) AS cnt " +
             "FROM " +
-            "    t_link_device_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_device_stats tlds ON tl.full_short_url = tlds.full_short_url " +
             "WHERE " +
-            "    full_short_url = #{param.fullShortUrl} " +
-            "    AND gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tlds.full_short_url = #{param.fullShortUrl} " +
+            "    AND tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status =  #{param.enableStatus} " +
+            "    AND tlds.date BETWEEN #{param.startDate} and #{param.endDate} " +
             "GROUP BY " +
-            "    full_short_url, gid, device;")
+            "    tlds.full_short_url, tl.gid, tlds.device;")
     List<LinkDeviceStatsDO> listDeviceStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
 
     /**
      * get a group of device monitor statistic between specified dates
      */
     @Select("SELECT " +
-            "    device, " +
-            "    SUM(cnt) AS cnt " +
+            "    tlds.device, " +
+            "    SUM(tlds.cnt) AS cnt " +
             "FROM " +
-            "    t_link_device_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_device_stats tlds ON tl.full_short_url = tlds.full_short_url " +
             "WHERE " +
-            "    gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status = '0' " +
+            "    AND tlds.date BETWEEN #{param.startDate} and #{param.endDate} " +
+
             "GROUP BY " +
-            "    gid, device;")
+            "    tl.gid, tlds.device;")
     List<LinkDeviceStatsDO> listDeviceStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
 
 }

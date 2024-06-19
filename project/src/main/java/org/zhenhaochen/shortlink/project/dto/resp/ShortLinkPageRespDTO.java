@@ -48,6 +48,11 @@ public class ShortLinkPageRespDTO {
     private Integer validDateType;
 
     /**
+     * enable flag 0: enabled 1: disabled
+     */
+    private Integer enableStatus;
+
+    /**
      * creation time
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/New_York")

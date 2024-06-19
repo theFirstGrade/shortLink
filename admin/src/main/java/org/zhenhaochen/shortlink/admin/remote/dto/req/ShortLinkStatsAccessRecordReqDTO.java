@@ -28,4 +28,10 @@ public class ShortLinkStatsAccessRecordReqDTO extends Page {
      * end date
      */
     private String endDate;
+
+    /**
+     * enable flag 0: enabled 1: disabled
+     */
+    private Integer enableStatus;
+
 }

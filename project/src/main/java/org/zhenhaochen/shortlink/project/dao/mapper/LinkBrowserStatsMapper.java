@@ -22,7 +22,6 @@ public interface LinkBrowserStatsMapper extends BaseMapper<LinkBrowserStatsDO> {
     @Insert("""
             INSERT INTO t_link_browser_stats (
                 full_short_url, 
-                gid, 
                 date, 
                 cnt, 
                 browser, 
@@ -31,7 +30,6 @@ public interface LinkBrowserStatsMapper extends BaseMapper<LinkBrowserStatsDO> {
                 del_flag
             ) VALUES (
                 #{linkBrowserStats.fullShortUrl}, 
-                #{linkBrowserStats.gid}, 
                 #{linkBrowserStats.date}, 
                 #{linkBrowserStats.cnt}, 
                 #{linkBrowserStats.browser}, 
@@ -48,30 +46,36 @@ public interface LinkBrowserStatsMapper extends BaseMapper<LinkBrowserStatsDO> {
      * get browser monitor statistic between specified dates
      */
     @Select("SELECT " +
-            "    browser, " +
-            "    SUM(cnt) AS count " +
+            "    tlbs.browser, " +
+            "    SUM(tlbs.cnt) AS count " +
             "FROM " +
-            "    t_link_browser_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_browser_stats tlbs ON tl.full_short_url = tlbs.full_short_url " +
             "WHERE " +
-            "    full_short_url = #{param.fullShortUrl} " +
-            "    AND gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tlbs.full_short_url = #{param.fullShortUrl} " +
+            "    AND tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status =  #{param.enableStatus} " +
+            "    AND tlbs.date BETWEEN #{param.startDate} and #{param.endDate} " +
             "GROUP BY " +
-            "    full_short_url, gid, browser;")
+            "    tlbs.full_short_url, tl.gid, tlbs.browser;")
     List<HashMap<String, Object>> listBrowserStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
 
     /**
      * get a group of browser monitor statistic between specified dates
      */
     @Select("SELECT " +
-            "    browser, " +
-            "    SUM(cnt) AS count " +
+            "    tlbs.browser, " +
+            "    SUM(tlbs.cnt) AS count " +
             "FROM " +
-            "    t_link_browser_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_browser_stats tlbs ON tl.full_short_url = tlbs.full_short_url " +
             "WHERE " +
-            "    gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status = '0' " +
+            "    AND tlbs.date BETWEEN #{param.startDate} and #{param.endDate} " +
             "GROUP BY " +
-            "    gid, browser;")
+            "    tl.gid, tlbs.browser;")
     List<HashMap<String, Object>> listBrowserStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
 }

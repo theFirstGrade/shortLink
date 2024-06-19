@@ -30,11 +30,6 @@ public class LinkAccessStatsDO extends BaseDO {
     private String fullShortUrl;
 
     /**
-     * gid
-     */
-    private String gid;
-
-    /**
      * create date
      */
     private Date date;

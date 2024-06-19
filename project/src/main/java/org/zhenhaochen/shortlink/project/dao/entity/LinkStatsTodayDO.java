@@ -25,11 +25,6 @@ public class LinkStatsTodayDO extends BaseDO {
     private Long id;
 
     /**
-     * gid
-     */
-    private String gid;
-
-    /**
      * full short link
      */
     private String fullShortUrl;

@@ -1,11 +1,11 @@
 package org.zhenhaochen.shortlink.project.dao.mapper;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.zhenhaochen.shortlink.project.dao.entity.ShortLinkDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Update;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Param;
+import org.zhenhaochen.shortlink.project.dao.entity.ShortLinkDO;
 import org.zhenhaochen.shortlink.project.dto.req.ShortLinkPageReqDTO;
+import org.zhenhaochen.shortlink.project.dto.req.ShortLinkRecycleBinPageReqDTO;
 
 /**
  * Short Link Persistence Layer
@@ -15,7 +15,6 @@ public interface ShortLinkMapper extends BaseMapper<ShortLinkDO> {
     /**
      * increment pv, uv, uip when restoring short link
      */
-    @Update("update t_link set total_pv = total_pv + #{totalPv}, total_uv = total_uv + #{totalUv}, total_uip = total_uip + #{totalUip}, update_time = NOW() where gid = #{gid} and full_short_url = #{fullShortUrl}")
     void incrementStats(
             @Param("gid") String gid,
             @Param("fullShortUrl") String fullShortUrl,
@@ -28,4 +27,9 @@ public interface ShortLinkMapper extends BaseMapper<ShortLinkDO> {
      * paging statistic
      */
     IPage<ShortLinkDO> pageLink(ShortLinkPageReqDTO requestParam);
+
+    /**
+     * paging query recycle bin
+     */
+    IPage<ShortLinkDO> pageRecycleBinLink(ShortLinkRecycleBinPageReqDTO requestParam);
 }

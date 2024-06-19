@@ -30,11 +30,6 @@ public class LinkBrowserStatsDO extends BaseDO {
     private String fullShortUrl;
 
     /**
-     * gid
-     */
-    private String gid;
-
-    /**
      * date
      */
     private Date date;

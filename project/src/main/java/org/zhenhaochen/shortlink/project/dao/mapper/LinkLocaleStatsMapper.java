@@ -21,7 +21,6 @@ public interface LinkLocaleStatsMapper extends BaseMapper<LinkLocaleStatsDO> {
     @Insert("""
             INSERT INTO t_link_locale_stats (
                 full_short_url, 
-                gid, 
                 date, 
                 cnt, 
                 country, 
@@ -33,7 +32,6 @@ public interface LinkLocaleStatsMapper extends BaseMapper<LinkLocaleStatsDO> {
                 del_flag
             ) VALUES (
                 #{linkLocaleStats.fullShortUrl}, 
-                #{linkLocaleStats.gid}, 
                 #{linkLocaleStats.date}, 
                 #{linkLocaleStats.cnt}, 
                 #{linkLocaleStats.country}, 
@@ -53,31 +51,37 @@ public interface LinkLocaleStatsMapper extends BaseMapper<LinkLocaleStatsDO> {
      * get province monitor statistic between specified dates
      */
     @Select("SELECT " +
-            "    province, " +
-            "    SUM(cnt) AS cnt " +
+            "    tlls.province, " +
+            "    SUM(tlls.cnt) AS cnt " +
             "FROM " +
-            "    t_link_locale_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_locale_stats tlls ON tl.full_short_url = tlls.full_short_url " +
             "WHERE " +
-            "    full_short_url = #{param.fullShortUrl} " +
-            "    AND gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tlls.full_short_url = #{param.fullShortUrl} " +
+            "    AND tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status =  #{param.enableStatus} " +
+            "    AND tlls.date BETWEEN #{param.startDate} and #{param.endDate} " +
             "GROUP BY " +
-            "    full_short_url, gid, province;")
+            "    tlls.full_short_url, tl.gid, tlls.province;")
     List<LinkLocaleStatsDO> listLocaleByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
 
     /**
      * get a group of province monitor statistic between specified dates
      */
     @Select("SELECT " +
-            "    province, " +
-            "    SUM(cnt) AS cnt " +
+            "    tlls.province, " +
+            "    SUM(tlls.cnt) AS cnt " +
             "FROM " +
-            "    t_link_locale_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_locale_stats tlls ON tl.full_short_url = tlls.full_short_url " +
             "WHERE " +
-            "    gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status = '0' " +
+            "    AND tlls.date BETWEEN #{param.startDate} and #{param.endDate} " +
             "GROUP BY " +
-            "    gid, province;")
+            "    tl.gid, tlls.province;")
     List<LinkLocaleStatsDO> listLocaleByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
 
 }

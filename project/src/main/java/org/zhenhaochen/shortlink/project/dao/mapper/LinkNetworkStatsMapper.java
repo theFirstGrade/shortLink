@@ -21,7 +21,6 @@ public interface LinkNetworkStatsMapper extends BaseMapper<LinkNetworkStatsDO> {
     @Insert("""
             INSERT INTO t_link_network_stats (
                 full_short_url, 
-                gid, 
                 date, 
                 cnt, 
                 network, 
@@ -30,7 +29,6 @@ public interface LinkNetworkStatsMapper extends BaseMapper<LinkNetworkStatsDO> {
                 del_flag
             ) VALUES (
                 #{linkNetworkStats.fullShortUrl}, 
-                #{linkNetworkStats.gid}, 
                 #{linkNetworkStats.date}, 
                 #{linkNetworkStats.cnt}, 
                 #{linkNetworkStats.network}, 
@@ -47,31 +45,37 @@ public interface LinkNetworkStatsMapper extends BaseMapper<LinkNetworkStatsDO> {
      * get network monitor statistic between specified dates
      */
     @Select("SELECT " +
-            "    network, " +
-            "    SUM(cnt) AS cnt " +
+            "    tlns.network, " +
+            "    SUM(tlns.cnt) AS cnt " +
             "FROM " +
-            "    t_link_network_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_network_stats tlns ON tl.full_short_url = tlns.full_short_url " +
             "WHERE " +
-            "    full_short_url = #{param.fullShortUrl} " +
-            "    AND gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tlns.full_short_url = #{param.fullShortUrl} " +
+            "    AND tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status =  #{param.enableStatus} " +
+            "    AND tlns.date BETWEEN #{param.startDate} and #{param.endDate} " +
             "GROUP BY " +
-            "    full_short_url, gid, network;")
+            "    tlns.full_short_url, tl.gid, tlns.network;")
     List<LinkNetworkStatsDO> listNetworkStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
 
     /**
      * get a group of network monitor statistic between specified dates
      */
     @Select("SELECT " +
-            "    network, " +
-            "    SUM(cnt) AS cnt " +
+            "    tlns.network, " +
+            "    SUM(tlns.cnt) AS cnt " +
             "FROM " +
-            "    t_link_network_stats " +
+            "    t_link tl INNER JOIN " +
+            "    t_link_network_stats tlns ON tl.full_short_url = tlns.full_short_url " +
             "WHERE " +
-            "    gid = #{param.gid} " +
-            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "    tl.gid = #{param.gid} " +
+            "    AND tl.del_flag = '0' " +
+            "    AND tl.enable_status = '0' " +
+            "    AND tlns.date BETWEEN #{param.startDate} and #{param.endDate} " +
             "GROUP BY " +
-            "    gid, network;")
+            "    tl.gid, tlns.network;")
     List<LinkNetworkStatsDO> listNetworkStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
 }
 

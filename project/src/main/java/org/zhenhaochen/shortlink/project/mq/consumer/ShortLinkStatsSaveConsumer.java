@@ -23,7 +23,6 @@ import org.zhenhaochen.shortlink.project.dao.entity.*;
 import org.zhenhaochen.shortlink.project.dao.mapper.*;
 import org.zhenhaochen.shortlink.project.dto.biz.ShortLinkStatsRecordDTO;
 import org.zhenhaochen.shortlink.project.mq.idempotent.MessageQueueIdempotentHandler;
-import org.zhenhaochen.shortlink.project.mq.producer.DelayShortLinkStatsProducer;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -53,7 +52,6 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
     private final LinkDeviceStatsMapper linkDeviceStatsMapper;
     private final LinkNetworkStatsMapper linkNetworkStatsMapper;
     private final LinkStatsTodayMapper linkTodayStatsMapper;
-    private final DelayShortLinkStatsProducer delayShortLinkStatsProducer;
     private final StringRedisTemplate stringRedisTemplate;
     private final MessageQueueIdempotentHandler messageQueueIdempotentHandler;
 
@@ -112,7 +110,6 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
                     .hour(hourOfDay)
                     .weekday(dayOfWeek)
                     .fullShortUrl(fullShortUrl)
-                    .gid(gid)
                     .date(date)
                     .build();
             linkAccessStatsMapper.shortLinkStats(linkAccessStatsDO);
@@ -134,7 +131,6 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
                             .cnt(1)
                             .fullShortUrl(fullShortUrl)
                             .country("US")
-                            .gid(gid)
                             .date(date)
                             .build();
                     linkLocaleStatsMapper.shortLinkLocaleState(linkLocaleStatsDO);
@@ -146,7 +142,6 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
             LinkOsStatsDO linkOsStatsDO = LinkOsStatsDO.builder()
                     .os(statsRecord.getOs())
                     .cnt(1)
-                    .gid(gid)
                     .fullShortUrl(fullShortUrl)
                     .date(date)
                     .build();
@@ -155,7 +150,6 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
             LinkBrowserStatsDO linkBrowserStatsDO = LinkBrowserStatsDO.builder()
                     .browser(statsRecord.getBrowser())
                     .cnt(1)
-                    .gid(gid)
                     .fullShortUrl(fullShortUrl)
                     .date(date)
                     .build();
@@ -164,7 +158,6 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
             LinkDeviceStatsDO linkDeviceStatsDO = LinkDeviceStatsDO.builder()
                     .device(statsRecord.getDevice())
                     .cnt(1)
-                    .gid(gid)
                     .fullShortUrl(fullShortUrl)
                     .date(date)
                     .build();
@@ -173,7 +166,6 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
             LinkNetworkStatsDO linkNetworkStatsDO = LinkNetworkStatsDO.builder()
                     .network(statsRecord.getNetwork())
                     .cnt(1)
-                    .gid(gid)
                     .fullShortUrl(fullShortUrl)
                     .date(date)
                     .build();
@@ -187,7 +179,6 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
                     .network(statsRecord.getNetwork())
                     .device(statsRecord.getDevice())
                     .locale(StrUtil.join("-", "US", actualProvince, actualCity))
-                    .gid(gid)
                     .fullShortUrl(fullShortUrl)
                     .build();
             linkAccessLogsMapper.insert(linkAccessLogsDO);
@@ -202,7 +193,6 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
                     .todayPv(1)
                     .todayUv(statsRecord.getUvFirstFlag() ? 1 : 0)
                     .todayUip(statsRecord.getUipFirstFlag() ? 1 : 0)
-                    .gid(gid)
                     .fullShortUrl(fullShortUrl)
                     .date(date)
                     .build();

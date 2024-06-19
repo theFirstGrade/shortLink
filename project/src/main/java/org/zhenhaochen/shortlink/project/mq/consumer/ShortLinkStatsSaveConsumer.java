@@ -29,7 +29,6 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.zhenhaochen.shortlink.project.common.constant.RedisKeyConstant.LOCK_GID_UPDATE_KEY;
 
@@ -72,12 +71,8 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
         }
         try {
             Map<String, String> producerMap = message.getValue();
-            String fullShortUrl = producerMap.get("fullShortUrl");
-            if (StrUtil.isNotBlank(fullShortUrl)) {
-                String gid = producerMap.get("gid");
-                ShortLinkStatsRecordDTO statsRecord = JSON.parseObject(producerMap.get("statsRecord"), ShortLinkStatsRecordDTO.class);
-                actualSaveShortLinkStats(fullShortUrl, gid, statsRecord);
-            }
+            ShortLinkStatsRecordDTO statsRecord = JSON.parseObject(producerMap.get("statsRecord"), ShortLinkStatsRecordDTO.class);
+            actualSaveShortLinkStats(statsRecord);
             stringRedisTemplate.opsForStream().delete(Objects.requireNonNull(stream), id.getValue());
         } catch (Throwable ex) {
             // if the server breaks down
@@ -88,18 +83,16 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
         messageQueueIdempotentHandler.setAccomplished(id.toString());
     }
 
-    public void actualSaveShortLinkStats(String fullShortUrl, String gid, ShortLinkStatsRecordDTO statsRecord) {
-        fullShortUrl = Optional.ofNullable(fullShortUrl).orElse(statsRecord.getFullShortUrl());
+    public void actualSaveShortLinkStats(ShortLinkStatsRecordDTO statsRecord) {
+        String fullShortUrl = statsRecord.getFullShortUrl();
         RReadWriteLock readWriteLock = redissonClient.getReadWriteLock(String.format(LOCK_GID_UPDATE_KEY, fullShortUrl));
         RLock rLock = readWriteLock.readLock();
         rLock.lock();
         try {
-            if (StrUtil.isBlank(gid)) {
-                LambdaQueryWrapper<ShortLinkGotoDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
-                        .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
-                ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(queryWrapper);
-                gid = shortLinkGotoDO.getGid();
-            }
+            LambdaQueryWrapper<ShortLinkGotoDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
+                    .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
+            ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(queryWrapper);
+            String gid = shortLinkGotoDO.getGid();
             Date date = new Date();
             int hourOfDay = LocalTime.now().getHour();
             int dayOfWeek = LocalDate.now().getDayOfWeek().getValue();

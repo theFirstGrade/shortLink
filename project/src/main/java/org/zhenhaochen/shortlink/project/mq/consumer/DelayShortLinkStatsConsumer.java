@@ -52,7 +52,7 @@ public class DelayShortLinkStatsConsumer implements InitializingBean {
                                     throw new ServerException("the message is processed but not accomplished, message queue will retry");
                                 }
                                 try {
-                                    shortLinkService.shortLinkStats(null, null, statsRecord);
+                                    shortLinkService.shortLinkStats(statsRecord);
                                 } catch (Throwable ex) {
                                     messageQueueIdempotentHandler.delMessageProcessed(statsRecord.getKeys());
                                     log.error("fail to delayed record short link monitor statistic", ex);

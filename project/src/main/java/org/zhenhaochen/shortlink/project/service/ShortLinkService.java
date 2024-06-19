@@ -67,11 +67,8 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
 
     /**
      * short link statistic
-     *
-     * @param fullShortUrl         full short link
-     * @param gid                  gid
      * @param shortLinkStatsRecord short link statistic Entity
      */
-    void shortLinkStats(String fullShortUrl, String gid, ShortLinkStatsRecordDTO shortLinkStatsRecord);
+    void shortLinkStats(ShortLinkStatsRecordDTO shortLinkStatsRecord);
 
 }

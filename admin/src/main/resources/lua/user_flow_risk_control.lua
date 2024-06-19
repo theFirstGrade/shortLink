@@ -9,7 +9,9 @@ local accessKey = "short-link:user-flow-risk-control:" .. username
 local currentAccessCount = redis.call("INCR", accessKey)
 
 -- set key expiration
-redis.call("EXPIRE", accessKey, timeWindow)
+if currentAccessCount == 1 then
+    redis.call("EXPIRE", accessKey, timeWindow)
+end
 
 -- return current access count
 return currentAccessCount

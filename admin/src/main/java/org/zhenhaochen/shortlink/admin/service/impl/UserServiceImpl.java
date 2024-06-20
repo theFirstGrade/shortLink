@@ -16,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.zhenhaochen.shortlink.admin.common.biz.user.UserContext;
 import org.zhenhaochen.shortlink.admin.common.convention.exception.ClientException;
 import org.zhenhaochen.shortlink.admin.dao.entity.UserDO;
@@ -66,6 +67,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         return userRegisterCachePenetrationBloomFilter.contains(username);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void register(UserRegisterReqDTO requestParam) {
         if (hasUsername(requestParam.getUsername())) {
@@ -80,8 +82,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             if (inserted < 1) {
                 throw new ClientException(USER_SAVE_ERROR);
             }
-            userRegisterCachePenetrationBloomFilter.add(requestParam.getUsername());
             groupService.saveGroup(requestParam.getUsername(), "default group");
+            userRegisterCachePenetrationBloomFilter.add(requestParam.getUsername());
         } catch (DuplicateKeyException ex) {
             throw new ClientException(USER_EXIST);
         } finally {

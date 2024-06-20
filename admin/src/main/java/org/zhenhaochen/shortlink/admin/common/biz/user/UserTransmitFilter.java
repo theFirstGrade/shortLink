@@ -6,13 +6,11 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 /**
- * User Information Filter
+ * User Information Transmit Filter
  */
-@RequiredArgsConstructor
 public class UserTransmitFilter implements Filter {
 
     @SneakyThrows

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.zhenhaochen.shortlink.admin.common.convention.result.Result;
+import org.zhenhaochen.shortlink.admin.config.OpenFeignConfiguration;
 import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinRecoverReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinRemoveReqDTO;
 import org.zhenhaochen.shortlink.admin.dto.req.RecycleBinSaveReqDTO;
@@ -19,7 +20,11 @@ import java.util.List;
 /**
  * Short Link Admin Remote Revoke
  */
-@FeignClient(value = "short-link-project", url = "${aggregation.remote-url:}")
+@FeignClient(
+        value = "short-link-project",
+        url = "${aggregation.remote-url:}",
+        configuration = OpenFeignConfiguration.class
+)
 public interface ShortLinkActualRemoteService {
 
     /**

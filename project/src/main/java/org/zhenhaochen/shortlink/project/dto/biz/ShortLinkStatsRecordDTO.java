@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 /**
  * Short Link Statistic Entity
  */
@@ -63,4 +65,10 @@ public class ShortLinkStatsRecordDTO {
      * message queue unique id
      */
     private String keys;
+
+    /**
+     * current date
+     */
+    private Date currentDate;
+
 }

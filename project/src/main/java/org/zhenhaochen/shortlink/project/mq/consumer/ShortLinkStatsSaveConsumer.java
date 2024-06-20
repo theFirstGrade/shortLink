@@ -1,5 +1,6 @@
 package org.zhenhaochen.shortlink.project.mq.consumer;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -24,8 +25,6 @@ import org.zhenhaochen.shortlink.project.dao.mapper.*;
 import org.zhenhaochen.shortlink.project.dto.biz.ShortLinkStatsRecordDTO;
 import org.zhenhaochen.shortlink.project.mq.idempotent.MessageQueueIdempotentHandler;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -93,9 +92,9 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
                     .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
             ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(queryWrapper);
             String gid = shortLinkGotoDO.getGid();
-            Date date = new Date();
-            int hourOfDay = LocalTime.now().getHour();
-            int dayOfWeek = LocalDate.now().getDayOfWeek().getValue();
+            Date date = statsRecord.getCurrentDate();
+            int hourOfDay = DateUtil.hour(date, true);
+            int dayOfWeek = DateUtil.dayOfWeekEnum(date).getIso8601Value();
             LinkAccessStatsDO linkAccessStatsDO = LinkAccessStatsDO.builder()
                     .pv(1)
                     .uv(statsRecord.getUvFirstFlag() ? 1 : 0)

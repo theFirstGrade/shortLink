@@ -49,6 +49,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
     @Value("${short-link.group.max-num}")
     private Integer groupMaxNum;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveGroup(String groupName) {
         this.saveGroup(UserContext.getUsername(), groupName);
@@ -98,7 +99,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getUsername, UserContext.getUsername())
                 .eq(GroupDO::getDelFlag, 0)
-                .orderByDesc(List.of(GroupDO::getSortOrder, GroupDO::getUpdateTime));
+                .orderByDesc(List.of(GroupDO::getSortOrder, GroupDO::getCreateTime));
         List<GroupDO> groupDOList = baseMapper.selectList(queryWrapper);
         Result<List<ShortLinkGroupCountQueryRespDTO>> listResult = shortLinkActualRemoteService
                 .listGroupShortLinkCount(groupDOList.stream().map(GroupDO::getGid).toList());
@@ -165,7 +166,8 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
             } catch (DuplicateKeyException e) {
                 return null;
             }
+            return gid;
         }
-        return gid;
+        return null;
     }
 }

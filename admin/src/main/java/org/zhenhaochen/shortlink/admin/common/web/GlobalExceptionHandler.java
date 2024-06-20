@@ -1,6 +1,7 @@
 package org.zhenhaochen.shortlink.admin.common.web;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
@@ -17,6 +18,7 @@ import org.zhenhaochen.shortlink.admin.common.convention.exception.AbstractExcep
 import org.zhenhaochen.shortlink.admin.common.convention.result.Result;
 import org.zhenhaochen.shortlink.admin.common.convention.result.Results;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -62,6 +64,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Throwable.class)
     public Result defaultErrorHandler(HttpServletRequest request, Throwable throwable) {
         log.error("[{}] {} ", request.getMethod(), getUrl(request), throwable);
+        // below 5 lines are for aggregation mode
+        if (Objects.equals(throwable.getClass().getSuperclass().getSimpleName(), AbstractException.class.getSimpleName())) {
+            String errorCode = ReflectUtil.getFieldValue(throwable, "errorCode").toString();
+            String errorMessage = ReflectUtil.getFieldValue(throwable, "errorMessage").toString();
+            return Results.failure(errorCode, errorMessage);
+        }
         return Results.failure();
     }
 
